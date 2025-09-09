@@ -17,9 +17,9 @@ export function useQuinceaneraConfig() {
     // Contacto
     nombreFamilia:
       process.env.NEXT_PUBLIC_NOMBRE_FAMILIA || "Familia García López",
-    telefono: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+52 (555) 123-4567",
+    telefono: process.env.NEXT_PUBLIC_TELEFONO || "+54 11 1234-5678",
     email: process.env.NEXT_PUBLIC_EMAIL_EVENTO || "isabella.quince@email.com",
-    whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "5255551234567",
+    whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+541155299849",
 
     // Redes sociales
     instagramUser: process.env.NEXT_PUBLIC_INSTAGRAM_USER || "isabella_quince",
@@ -29,6 +29,32 @@ export function useQuinceaneraConfig() {
     // Fechas límite
     fechaLimiteRSVP:
       process.env.NEXT_PUBLIC_FECHA_LIMITE_RSVP || "30 de Julio, 2025",
+
+    // Información bancaria para regalos
+    alias: process.env.NEXT_PUBLIC_ALIAS_BANCARIO || "isabella.15años",
+    cbu: process.env.NEXT_PUBLIC_CBU || "",
+    nombreCuentaBancaria: process.env.NEXT_PUBLIC_NOMBRE_CUENTA_BANCARIA || "",
+
+    // URLs y configuración
+    productionUrl:
+      process.env.NEXT_PUBLIC_PRODUCTION_URL ||
+      "https://invitacion-quinceañera.vercel.app",
+
+    // Música
+    musicUrl: process.env.NEXT_PUBLIC_MUSIC_URL || "",
+    musicTitle: process.env.NEXT_PUBLIC_MUSIC_TITLE || "Música de Fondo",
+
+    // Admin
+    adminPassword: process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin123",
+
+    // Base de datos
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+    supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+
+    // Email
+    emailJsServiceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
+    emailJsTemplateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "",
+    emailJsPublicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "",
   };
 
   // Generar hashtag automáticamente basado en nombre y edad

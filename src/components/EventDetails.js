@@ -5,7 +5,8 @@ import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { useQuinceaneraConfig } from "@/hooks/useQuinceaneraConfig";
 
 export default function EventDetails() {
-  const { fechaEvento, horaEvento, lugar, direccion } = useQuinceaneraConfig();
+  const { fechaEvento, horaEvento, lugar, direccion, alias } =
+    useQuinceaneraConfig();
 
   const details = [
     {
@@ -89,7 +90,7 @@ export default function EventDetails() {
           <h3 className="font-serif text-bold text-xl text-gray-600 max-w-2xl mx-auto mb-4">
             Tu presencia es muy importante para mi, pero si queres dejarme un
             detalle te dejo mi alias{" "}
-            <span className="text-quince-600 ">camii.belen77</span>
+            <span className="text-quince-600">{alias}</span>
           </h3>
         </motion.div>
       </div>

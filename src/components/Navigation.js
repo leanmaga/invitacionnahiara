@@ -18,6 +18,10 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  // Variable de entorno para el nombre de la quinceañera
+  const nombreQuinceanera =
+    process.env.NEXT_PUBLIC_NOMBRE_QUINCEANERA || "Quinceañera";
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -63,7 +67,7 @@ export default function Navigation() {
               whileHover={{ scale: 1.05 }}
               className="font-coockie text-xl sm:text-2xl md:text-3xl font-bold text-quince-400 flex-shrink-0"
             >
-              Cami
+              {nombreQuinceanera}
             </motion.div>
 
             {/* Desktop Navigation */}

@@ -2,19 +2,42 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Heart, Crown, Sparkles, Apple as WhatsApp } from "lucide-react";
+import {
+  Heart,
+  Crown,
+  Sparkles,
+  Phone,
+  MessageCircle,
+  Instagram,
+  Facebook,
+} from "lucide-react";
 import { useQuinceaneraConfig } from "@/hooks/useQuinceaneraConfig";
 import AnimatedButterflies from "./AnimatedButterflies";
 
 export default function Footer() {
   const [mounted, setMounted] = useState(false);
-  const { nombre, telefono, fechaEvento, horaEvento, lugar, direccion } =
-    useQuinceaneraConfig();
+  const {
+    nombre,
+    telefono,
+    whatsapp,
+    fechaEvento,
+    horaEvento,
+    lugar,
+    direccion,
+    instagramUser,
+    facebookPage,
+    nombreFamilia,
+  } = useQuinceaneraConfig();
 
   // Solo ejecutar en el cliente para evitar errores de hidratación
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const whatsappLink = `https://wa.me/${whatsapp.replace(
+    /[^0-9]/g,
+    ""
+  )}?text=Hola! Te escribo por la invitación de los 15 de ${nombre}`;
 
   return (
     <footer className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-16 relative overflow-hidden">
@@ -40,7 +63,7 @@ export default function Footer() {
           </p>
         </motion.div>
 
-        <div className="flex items-center justify-center gap-12 mb-12">
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
           {/* Contact Info */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -50,10 +73,31 @@ export default function Footer() {
             className="text-center md:text-left"
           >
             <h3 className="font-serif text-xl font-bold mb-4 text-quince-300">
-              Información de Contacto
+              Contacto
             </h3>
-            <div className="space-y-2 text-gray-300">
-              <p>{telefono}</p>
+            <div className="space-y-3 text-gray-300">
+              <p className="font-medium">{nombreFamilia}</p>
+
+              {telefono && (
+                <div className="flex items-center gap-2 justify-center md:justify-start">
+                  <Phone className="w-4 h-4 text-quince-400" />
+                  <span>{telefono}</span>
+                </div>
+              )}
+
+              {whatsapp && (
+                <motion.a
+                  href={whatsappLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>WhatsApp</span>
+                </motion.a>
+              )}
             </div>
           </motion.div>
 
@@ -69,11 +113,55 @@ export default function Footer() {
               Detalles del Evento
             </h3>
             <div className="space-y-2 text-gray-300">
-              <p>{fechaEvento}</p>
+              <p className="font-medium">{fechaEvento}</p>
               <p>{horaEvento}</p>
-              <p>{lugar}</p>
-              <p>{direccion}</p>
+              <p className="font-medium">{lugar}</p>
+              <p className="text-sm">{direccion}</p>
             </div>
+          </motion.div>
+
+          {/* Social Media */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="text-center md:text-right"
+          >
+            <h3 className="font-serif text-xl font-bold mb-4 text-quince-300">
+              Sígueme
+            </h3>
+            <div className="flex gap-4 justify-center md:justify-end">
+              {instagramUser && (
+                <motion.a
+                  href={`https://instagram.com/${instagramUser}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center hover:shadow-lg transition-shadow"
+                >
+                  <Instagram className="w-5 h-5" />
+                </motion.a>
+              )}
+
+              {facebookPage && (
+                <motion.a
+                  href={`https://facebook.com/${facebookPage}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.1, rotate: -5 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:shadow-lg transition-shadow"
+                >
+                  <Facebook className="w-5 h-5" />
+                </motion.a>
+              )}
+            </div>
+
+            {instagramUser && (
+              <p className="text-sm text-gray-400 mt-2">@{instagramUser}</p>
+            )}
           </motion.div>
         </div>
 
