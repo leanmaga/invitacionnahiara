@@ -10,10 +10,7 @@ import React, {
 const AudioContext = createContext();
 
 // Provider del contexto - este componente maneja TODO el audio
-export const AudioProvider = ({
-  children,
-  audioSrc = "/AThousandYears.mp3",
-}) => {
+export const AudioProvider = ({ children, audioSrc = "/IchikoAoba.mp3" }) => {
   // Estados del audio
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

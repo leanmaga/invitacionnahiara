@@ -13,7 +13,7 @@ import { AudioProvider } from "@/components/AudioContext";
 
 export default function Home() {
   return (
-    <AudioProvider audioSrc="/HayUnCuento.mp3">
+    <AudioProvider audioSrc="/IchikoAoba.mp3">
       <div className="min-h-screen w-full overflow-x-hidden">
         <motion.div
           initial={{ opacity: 0 }}

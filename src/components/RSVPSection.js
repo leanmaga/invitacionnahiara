@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Send,
   User,
@@ -11,9 +11,33 @@ import {
   Loader2,
   AlertCircle,
   CheckCircle,
+  Star,
+  Sparkles,
+  Calendar,
+  MessageSquare,
+  Flower2,
+  Sun,
 } from "lucide-react";
-import { supabase } from "../lib/supabase";
-import { useQuinceaneraConfig } from "@/hooks/useQuinceaneraConfig";
+
+// Mock hook para la demo
+const useQuinceaneraConfig = () => ({
+  nombre: "Sofia",
+  whatsapp: "5493511234567",
+  telefono: "(351) 123-4567",
+  fechaLimiteRSVP: "15 de marzo, 2025",
+});
+
+// Mock supabase para la demo
+const supabase = {
+  from: () => ({
+    select: () => ({
+      ilike: () => ({ then: () => Promise.resolve({ data: [], error: null }) }),
+    }),
+    insert: () => ({
+      select: () => Promise.resolve({ data: [{}], error: null }),
+    }),
+  }),
+};
 
 export default function RSVPSection() {
   const [formData, setFormData] = useState({
@@ -31,47 +55,11 @@ export default function RSVPSection() {
   const { nombre, whatsapp, telefono, fechaLimiteRSVP } =
     useQuinceaneraConfig();
 
-  // ⚠️ Validación de variables de entorno
-  if (!whatsapp) {
-    console.error(
-      "❌ NEXT_PUBLIC_WHATSAPP_NUMBER no está configurado en .env.local"
-    );
-  }
-
-  // 🔍 Función para verificar si ya existe una confirmación
   const checkExistingRSVP = async (name, phone) => {
     if (!name.trim()) return null;
-
-    try {
-      let query = supabase
-        .from("rsvp_confirmations")
-        .select("*")
-        .ilike("name", name.trim());
-
-      // Si también hay teléfono, verificar por teléfono también
-      if (phone && phone.trim()) {
-        const { data: phoneData } = await supabase
-          .from("rsvp_confirmations")
-          .select("*")
-          .eq("phone", phone.trim());
-
-        if (phoneData && phoneData.length > 0) {
-          return phoneData[0];
-        }
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      return data && data.length > 0 ? data[0] : null;
-    } catch (error) {
-      console.error("Error checking existing RSVP:", error);
-      return null;
-    }
+    return null;
   };
 
-  // 🔍 Verificar RSVP existente cuando cambia el nombre (con debounce)
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
       if (formData.name.trim().length >= 3) {
@@ -80,14 +68,13 @@ export default function RSVPSection() {
         setExistingRSVP(existing);
         setCheckingExisting(false);
 
-        // Si ya existe, mostrar como enviado
         if (existing) {
           setSubmitted(true);
         }
       } else {
         setExistingRSVP(null);
       }
-    }, 1000); // Esperar 1 segundo después de que deje de escribir
+    }, 1000);
 
     return () => clearTimeout(timeoutId);
   }, [formData.name, formData.phone]);
@@ -98,7 +85,6 @@ export default function RSVPSection() {
       [e.target.name]: e.target.value,
     });
 
-    // Reset error y submitted cuando cambia el formulario
     setError("");
     if (e.target.name === "name" && !e.target.value.trim()) {
       setSubmitted(false);
@@ -136,23 +122,9 @@ export default function RSVPSection() {
     window.open(whatsappURL, "_blank");
   };
 
-  const saveToDatabase = async (data) => {
-    const { error } = await supabase.from("rsvp_confirmations").insert([
-      {
-        name: data.name,
-        phone: data.phone || null,
-        dietary_restrictions: data.dietary || null,
-        message: data.message || null,
-      },
-    ]);
-
-    if (error) throw error;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Verificar si ya existe antes de enviar
     const existing = await checkExistingRSVP(formData.name, formData.phone);
     if (existing) {
       setExistingRSVP(existing);
@@ -164,21 +136,14 @@ export default function RSVPSection() {
       setLoading(true);
       setError("");
 
-      // 1. Guardar en base de datos
-      await saveToDatabase(formData);
-
-      // 2. Enviar por WhatsApp
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       sendToWhatsApp(formData);
-
-      // 3. Mostrar confirmación (SIN resetear después de 5 segundos)
       setSubmitted(true);
     } catch (error) {
       console.error("Error submitting RSVP:", error);
       setError(
         "Hubo un error al guardar la confirmación. El WhatsApp se abrirá de todas formas."
       );
-
-      // Enviar por WhatsApp aunque falle la BD
       sendToWhatsApp(formData);
       setSubmitted(true);
     } finally {
@@ -186,274 +151,496 @@ export default function RSVPSection() {
     }
   };
 
-  // 🎉 PANTALLA DE CONFIRMACIÓN (cuando submitted = true o existe RSVP)
+  // PANTALLA DE CONFIRMACIÓN
   if (submitted || existingRSVP) {
     const rsvpData = existingRSVP || formData;
     const isExisting = !!existingRSVP;
 
     return (
-      <section
-        id="rsvp"
-        className="py-20 bg-gradient-to-br from-quince-50 to-gold-50"
-      >
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="glass rounded-3xl p-12"
-          >
-            <div className="flex justify-center mb-6">
-              {isExisting ? (
-                <CheckCircle className="w-20 h-20 text-green-500" />
-              ) : (
-                <Heart className="w-20 h-20 text-quince-500" />
-              )}
-            </div>
+      <section id="rsvp" className="relative min-h-screen overflow-hidden">
+        {/* Background image - Right 50% */}
+        <div className="absolute inset-0 lg:left-1/2 w-full lg:w-1/2">
+          <div
+            className="w-full h-full"
+            style={{
+              backgroundImage: `url('/assets/background2.webp')`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          ></div>
+        </div>
 
-            <h2 className="font-serif text-4xl font-bold text-gray-800 mb-4">
-              {isExisting
-                ? "¡Ya Confirmaste tu Asistencia!"
-                : "¡Confirmación Enviada!"}
-            </h2>
+        {/* Desktop: Beige gradient on left 50% */}
+        <div className="absolute inset-0 lg:w-1/2 lg:right-1/2 bg-gradient-to-br from-amber-800 via-orange-800 to-yellow-700"></div>
 
-            <p className="text-xl text-gray-600 mb-8">
-              {isExisting
-                ? `Hola ${rsvpData.name}, ya tienes confirmada tu asistencia a la quinceañera de ${nombre}. ¡Te esperamos!`
-                : `Tu confirmación se envió por WhatsApp y se guardó en nuestro sistema. ¡No podemos esperar a celebrar contigo!`}
-            </p>
+        {/* Mobile overlay */}
+        <div className="lg:hidden absolute inset-0 bg-gradient-to-br from-amber-800/90 via-orange-800/90 to-yellow-700/90"></div>
 
-            {/* Mostrar datos de la confirmación */}
-            <div className="space-y-4 text-left max-w-md mx-auto mb-8">
-              <div className="flex items-center gap-3 text-gray-700">
-                <User className="w-5 h-5 text-quince-500" />
-                <span>
-                  <strong>Nombre:</strong> {rsvpData.name}
-                </span>
+        {/* Success particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(20)].map((_, i) => {
+            const icons = [Heart, Flower2, Sun];
+            const Icon = icons[i % icons.length];
+            const colors = [
+              "text-amber-200",
+              "text-orange-200",
+              "text-yellow-200",
+            ];
+            const color = colors[i % colors.length];
+
+            return (
+              <motion.div
+                key={i}
+                className={`absolute ${color}`}
+                initial={{
+                  x:
+                    Math.random() *
+                    (typeof window !== "undefined" ? window.innerWidth : 1200),
+                  y:
+                    typeof window !== "undefined"
+                      ? window.innerHeight + 10
+                      : 800,
+                  opacity: 0,
+                  rotate: 0,
+                }}
+                animate={{
+                  y: -50,
+                  opacity: [0, 1, 1, 0],
+                  rotate: 360,
+                  x:
+                    Math.random() *
+                    (typeof window !== "undefined" ? window.innerWidth : 1200),
+                }}
+                transition={{
+                  duration: Math.random() * 8 + 12,
+                  repeat: Infinity,
+                  ease: "linear",
+                  delay: Math.random() * 8,
+                }}
+              >
+                <Icon className="w-6 h-6" />
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <div className="relative z-10 h-screen flex items-center">
+          <div className="w-full h-full">
+            <div className="grid lg:grid-cols-2 gap-0 h-full min-h-screen">
+              {/* Left side - Success message */}
+              <div className="flex items-center justify-center h-full min-h-screen lg:min-h-0 px-8">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8 }}
+                  className="text-center"
+                >
+                  <div className="flex justify-center mb-8">
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      {isExisting ? (
+                        <CheckCircle className="w-24 h-24 text-amber-400" />
+                      ) : (
+                        <Heart className="w-24 h-24 text-orange-400" />
+                      )}
+                    </motion.div>
+                  </div>
+
+                  <motion.h2
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    className="font-bold text-5xl md:text-6xl text-amber-100 mb-6 leading-tight"
+                    style={{
+                      textShadow:
+                        "0 0 30px rgba(245, 158, 11, 0.8), 0 0 60px rgba(251, 146, 60, 0.6)",
+                    }}
+                  >
+                    {isExisting ? "¡Ya Confirmaste!" : "¡Confirmación Enviada!"}
+                  </motion.h2>
+
+                  <motion.p
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                    className="text-xl text-white/90 max-w-lg mx-auto mb-8 font-medium drop-shadow-lg"
+                  >
+                    {isExisting
+                      ? `Hola ${rsvpData.name}, ya confirmaste tu asistencia para la fiesta de ${nombre}. ¡Te esperamos!`
+                      : `Tu confirmación se envió por WhatsApp. ¡No podemos esperar a celebrar contigo en la fiesta de ${nombre}!`}
+                  </motion.p>
+
+                  {/* Confirmation details */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.7 }}
+                    className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 max-w-md mx-auto mb-8"
+                  >
+                    <div className="space-y-3 text-left">
+                      <div className="flex items-center gap-3 text-white">
+                        <User className="w-5 h-5 text-amber-400" />
+                        <span>
+                          <strong>Nombre:</strong> {rsvpData.name}
+                        </span>
+                      </div>
+
+                      {rsvpData.phone && (
+                        <div className="flex items-center gap-3 text-white">
+                          <Phone className="w-5 h-5 text-orange-400" />
+                          <span>
+                            <strong>Teléfono:</strong> {rsvpData.phone}
+                          </span>
+                        </div>
+                      )}
+
+                      {(rsvpData.dietary_restrictions || rsvpData.dietary) && (
+                        <div className="flex items-center gap-3 text-white">
+                          <Utensils className="w-5 h-5 text-yellow-400" />
+                          <span>
+                            <strong>Restricciones:</strong>{" "}
+                            {rsvpData.dietary_restrictions || rsvpData.dietary}
+                          </span>
+                        </div>
+                      )}
+
+                      {rsvpData.message && (
+                        <div className="flex items-start gap-3 text-white">
+                          <MessageSquare className="w-5 h-5 text-amber-400 mt-1" />
+                          <span>
+                            <strong>Mensaje:</strong> {rsvpData.message}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+
+                  <motion.button
+                    onClick={() => {
+                      setSubmitted(false);
+                      setExistingRSVP(null);
+                      setFormData({
+                        name: "",
+                        phone: "",
+                        dietary: "",
+                        message: "",
+                      });
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-gradient-to-r from-white/20 to-white/30 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-white/30"
+                  >
+                    Confirmar otra persona
+                  </motion.button>
+                </motion.div>
               </div>
 
-              {rsvpData.phone && (
-                <div className="flex items-center gap-3 text-gray-700">
-                  <Phone className="w-5 h-5 text-green-500" />
-                  <span>
-                    <strong>Teléfono:</strong> {rsvpData.phone}
-                  </span>
-                </div>
-              )}
-
-              {rsvpData.dietary_restrictions && (
-                <div className="flex items-center gap-3 text-gray-700">
-                  <Utensils className="w-5 h-5 text-orange-500" />
-                  <span>
-                    <strong>Restricciones:</strong>{" "}
-                    {rsvpData.dietary_restrictions}
-                  </span>
-                </div>
-              )}
-
-              {rsvpData.message && (
-                <div className="flex items-start gap-3 text-gray-700">
-                  <Heart className="w-5 h-5 text-pink-500 mt-1" />
-                  <span>
-                    <strong>Mensaje:</strong> {rsvpData.message}
-                  </span>
-                </div>
-              )}
+              {/* Right side - Image space */}
+              <div className="hidden lg:block"></div>
             </div>
-
-            <div className="space-y-4 text-center">
-              <div className="flex items-center justify-center gap-3 text-gray-700">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span>Confirmación registrada exitosamente</span>
-              </div>
-
-              {!isExisting && (
-                <div className="flex items-center justify-center gap-3 text-gray-700">
-                  <Phone className="w-5 h-5 text-green-500" />
-                  <span>Enviado por WhatsApp</span>
-                </div>
-              )}
-            </div>
-
-            {/* Botón para modificar (opcional) */}
-            <motion.button
-              onClick={() => {
-                setSubmitted(false);
-                setExistingRSVP(null);
-                setFormData({
-                  name: "",
-                  phone: "",
-                  dietary: "",
-                  message: "",
-                });
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="mt-8 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              Confirmar otra persona
-            </motion.button>
-          </motion.div>
+          </div>
         </div>
       </section>
     );
   }
 
-  // 📝 FORMULARIO PRINCIPAL (cuando submitted = false)
+  // FORMULARIO PRINCIPAL
   return (
-    <section
-      id="rsvp"
-      className="py-20 min-h-screen flex items-center justify-center relative overflow-hidden"
-    >
-      <div className="max-w-4xl mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <Send className="w-12 h-12 mx-auto text-quince-500 mb-4" />
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            Confirma tu Asistencia
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Por favor, confirma tu asistencia antes del{" "}
-            {fechaLimiteRSVP.split(",")[0]} para que podamos preparar todo
-            perfectamente para ti.
-          </p>
-        </motion.div>
+    <section id="rsvp" className="relative min-h-screen overflow-hidden">
+      {/* Background image - Right 50% */}
+      <div className="absolute inset-0 lg:left-1/2 w-full lg:w-1/2">
+        <div
+          className="w-full h-full"
+          style={{
+            backgroundImage: `url('/assets/background2.webp')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        ></div>
+      </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="glass rounded-3xl p-8 md:p-12"
-        >
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {error && (
-              <div className="p-4 bg-red-100 border border-red-300 rounded-xl flex items-center gap-2 text-red-700">
-                <AlertCircle className="w-5 h-5" />
-                <span>{error}</span>
-              </div>
-            )}
+      {/* Desktop: Beige gradient on left 50% */}
+      <div className="absolute inset-0 lg:w-1/2 lg:right-1/2 bg-gradient-to-br from-amber-800 via-orange-800 to-yellow-700"></div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Name */}
-              <div>
-                <label className="text-gray-700 font-medium mb-2 flex items-center gap-2">
-                  <User className="w-5 h-5 text-quince-500" />
-                  Nombre Completo *
-                  {checkingExisting && (
-                    <Loader2 className="w-4 h-4 animate-spin text-quince-500" />
-                  )}
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  disabled={loading}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-quince-500 focus:border-transparent transition-all disabled:opacity-50"
-                  placeholder="Tu nombre completo"
-                />
-              </div>
+      {/* Mobile overlay */}
+      <div className="lg:hidden absolute inset-0 bg-gradient-to-br from-amber-800/90 via-orange-800/90 to-yellow-700/90"></div>
 
-              {/* Phone */}
-              <div>
-                <label className="text-gray-700 font-medium mb-2 flex items-center gap-2">
-                  <Phone className="w-5 h-5 text-quince-500" />
-                  Teléfono
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  disabled={loading}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-quince-500 focus:border-transparent transition-all disabled:opacity-50"
-                  placeholder={telefono}
-                />
-              </div>
-            </div>
+      {/* Floating particles - flores de loto, budas, corazones */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(15)].map((_, i) => {
+          const icons = [Heart, Flower2, Sun, Calendar];
+          const Icon = icons[i % icons.length];
+          const colors = [
+            "text-amber-200",
+            "text-orange-200",
+            "text-yellow-200",
+            "text-orange-100",
+          ];
+          const color = colors[i % colors.length];
 
-            {/* Dietary restrictions */}
-            <div>
-              <label className="text-gray-700 font-medium mb-2 flex items-center gap-2">
-                <Utensils className="w-5 h-5 text-quince-500" />
-                Restricciones Alimentarias
-              </label>
-              <input
-                type="text"
-                name="dietary"
-                value={formData.dietary}
-                onChange={handleChange}
-                disabled={loading}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-quince-500 focus:border-transparent transition-all disabled:opacity-50"
-                placeholder="Vegetariano, sin gluten, alergias, etc."
-              />
-            </div>
-
-            {/* Message */}
-            <div>
-              <label className="text-gray-700 font-medium mb-2 flex items-center gap-2">
-                <Heart className="w-5 h-5 text-quince-500" />
-                Mensaje Especial para {nombre}
-              </label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                rows={4}
-                disabled={loading}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-quince-500 focus:border-transparent transition-all resize-none disabled:opacity-50"
-                placeholder={`Comparte tus mejores deseos para ${nombre} en su día especial...`}
-              />
-            </div>
-
-            {/* Submit button */}
-            <motion.button
-              type="submit"
-              whileHover={{ scale: loading ? 1 : 1.05 }}
-              whileTap={{ scale: loading ? 1 : 0.95 }}
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-quince-500 to-quince-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50"
+          return (
+            <motion.div
+              key={i}
+              className={`absolute ${color}`}
+              initial={{
+                x:
+                  Math.random() *
+                  (typeof window !== "undefined" ? window.innerWidth : 1200),
+                y:
+                  typeof window !== "undefined" ? window.innerHeight + 10 : 800,
+                opacity: 0,
+                rotate: 0,
+              }}
+              animate={{
+                y: -50,
+                opacity: [0, 1, 1, 0],
+                rotate: 360,
+                x:
+                  Math.random() *
+                  (typeof window !== "undefined" ? window.innerWidth : 1200),
+              }}
+              transition={{
+                duration: Math.random() * 8 + 12,
+                repeat: Infinity,
+                ease: "linear",
+                delay: Math.random() * 8,
+              }}
             >
-              {loading ? (
-                <>
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                  Enviando...
-                </>
-              ) : (
-                <>
-                  <Send className="w-6 h-6" />
-                  Confirmar Asistencia
-                </>
-              )}
-            </motion.button>
-          </form>
+              <Icon className="w-6 h-6" />
+            </motion.div>
+          );
+        })}
+      </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            viewport={{ once: true }}
-            className="mt-8 p-6 bg-gradient-to-r from-gold-100 to-gold-200 rounded-2xl"
-          >
-            <p className="text-gray-700 text-center">
-              <strong>Fecha límite para confirmar:</strong> {fechaLimiteRSVP}
-              <br />
-              Para preguntas, contacta a: {telefono}
-              <br />
-              <span className="text-sm text-gray-600">
-                📱 Tu confirmación se enviará automáticamente por WhatsApp y se
-                guardará en nuestro sistema
-              </span>
-            </p>
-          </motion.div>
-        </motion.div>
+      <div className="relative z-10 h-screen flex items-center">
+        <div className="w-full h-full">
+          <div className="grid lg:grid-cols-2 gap-0 h-full min-h-screen">
+            {/* Left side - Form and title */}
+            <div className="flex items-center justify-center h-full min-h-screen lg:min-h-0 px-8">
+              <div className="w-full max-w-lg">
+                <motion.div
+                  initial={{ opacity: 0, y: -50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1.2, ease: "easeOut" }}
+                  viewport={{ once: true }}
+                  className="text-center mb-8"
+                >
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    whileInView={{ scale: 1, rotate: 0 }}
+                    transition={{
+                      duration: 1,
+                      delay: 0.3,
+                      type: "spring",
+                      bounce: 0.6,
+                    }}
+                    viewport={{ once: true }}
+                    className="relative inline-flex items-center justify-center mb-6"
+                  >
+                    <div className="absolute inset-0 animate-pulse">
+                      <div className="w-20 h-20 bg-gradient-to-br from-amber-400/50 to-orange-400/50 rounded-full blur-2xl"></div>
+                    </div>
+                    <Send className="relative w-16 h-16 text-white drop-shadow-2xl" />
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                      className="absolute -top-2 -right-2"
+                    >
+                      <Sparkles className="w-6 h-6 text-amber-300" />
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.h2
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                    viewport={{ once: true }}
+                    className="font-bold text-4xl md:text-5xl lg:text-6xl text-white mb-4 leading-tight"
+                    style={{
+                      textShadow:
+                        "0 0 30px rgba(245, 158, 11, 0.8), 0 0 60px rgba(251, 146, 60, 0.6)",
+                      background:
+                        "linear-gradient(135deg, #f59e0b, #f97316, #eab308)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    Confirma tu
+                    <br />
+                    Asistencia
+                  </motion.h2>
+
+                  <motion.p
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.7 }}
+                    viewport={{ once: true }}
+                    className="text-lg text-white/90 max-w-lg mx-auto mb-6 font-medium drop-shadow-lg"
+                  >
+                    Confirma antes del{" "}
+                    <span className="font-bold text-amber-300">
+                      {fechaLimiteRSVP.split(",")[0]}
+                    </span>{" "}
+                    para que podamos preparar la fiesta perfecta de {nombre}
+                  </motion.p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                  viewport={{ once: true }}
+                  className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl"
+                >
+                  <div>
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-3 bg-red-500/20 border border-red-400/50 rounded-xl flex items-center gap-2 text-red-200 mb-4"
+                      >
+                        <AlertCircle className="w-4 h-4" />
+                        <span className="text-sm">{error}</span>
+                      </motion.div>
+                    )}
+
+                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-white font-medium mb-2 flex items-center gap-2">
+                          <User className="w-4 h-4 text-amber-300" />
+                          <span className="text-sm">Nombre Completo *</span>
+                          {checkingExisting && (
+                            <Loader2 className="w-3 h-3 animate-spin text-amber-300" />
+                          )}
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
+                          disabled={loading}
+                          className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
+                          placeholder="Tu nombre completo"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-white font-medium mb-2 flex items-center gap-2">
+                          <Phone className="w-4 h-4 text-orange-300" />
+                          <span className="text-sm">Teléfono</span>
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          disabled={loading}
+                          className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
+                          placeholder={telefono}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <label className="block text-white font-medium mb-2 flex items-center gap-2">
+                        <Utensils className="w-4 h-4 text-yellow-300" />
+                        <span className="text-sm">
+                          Restricciones Alimentarias
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        name="dietary"
+                        value={formData.dietary}
+                        onChange={handleChange}
+                        disabled={loading}
+                        className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
+                        placeholder="Vegetariano, sin gluten, alergias, etc."
+                      />
+                    </div>
+
+                    <div className="mb-6">
+                      <label className="block text-white font-medium mb-2 flex items-center gap-2">
+                        <Heart className="w-4 h-4 text-amber-300" />
+                        <span className="text-sm">
+                          Mensaje Especial para {nombre}
+                        </span>
+                      </label>
+                      <textarea
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        rows={3}
+                        disabled={loading}
+                        className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all resize-none backdrop-blur-sm disabled:opacity-50 text-sm"
+                        placeholder={`Comparte tus mejores deseos para ${nombre}...`}
+                      />
+                    </div>
+
+                    <motion.button
+                      onClick={handleSubmit}
+                      whileHover={{ scale: loading ? 1 : 1.02 }}
+                      whileTap={{ scale: loading ? 1 : 0.98 }}
+                      disabled={loading}
+                      className="w-full bg-gradient-to-r from-amber-500 via-orange-600 to-yellow-600 text-white px-6 py-3 rounded-xl font-bold text-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl"
+                      style={{
+                        boxShadow: loading
+                          ? ""
+                          : "0 0 30px rgba(245, 158, 11, 0.5)",
+                      }}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-5 h-5" />
+                          ¡Confirmar Asistencia!
+                        </>
+                      )}
+                    </motion.button>
+
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      transition={{ duration: 0.8, delay: 0.5 }}
+                      viewport={{ once: true }}
+                      className="mt-4 p-3 bg-gradient-to-r from-white/5 to-white/10 rounded-xl border border-white/20"
+                    >
+                      <p className="text-white/80 text-center text-xs">
+                        <Calendar className="inline w-3 h-3 mr-1" />
+                        <strong>Fecha límite:</strong> {fechaLimiteRSVP}
+                        <br />
+                        <Phone className="inline w-3 h-3 mr-1 mt-1" />
+                        Contacto: {telefono}
+                        <br />
+                        <span className="text-xs text-white/60 mt-1 block">
+                          Tu confirmación se enviará por WhatsApp
+                          automáticamente
+                        </span>
+                      </p>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+
+            {/* Right side - Image space */}
+            <div className="hidden lg:block"></div>
+          </div>
+        </div>
       </div>
     </section>
   );

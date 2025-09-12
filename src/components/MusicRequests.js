@@ -9,6 +9,11 @@ import {
   Headphones,
   Loader2,
   AlertCircle,
+  Star,
+  Sparkles,
+  X,
+  Plus,
+  Volume2,
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
@@ -19,22 +24,27 @@ export default function MusicRequests() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showForm, setShowForm] = useState(false);
 
   // Estados para la base de datos
   const [dbSongs, setDbSongs] = useState([]);
   const [loadingSongs, setLoadingSongs] = useState(true);
 
+  // Función para obtener el texto del contador de canciones
+  const getSongsCountText = (count) => {
+    if (count === 0) return "0 canciones";
+    if (count === 1) return "1 canción";
+    return `${count} canciones`;
+  };
+
   // Cargar canciones al montar el componente
   useEffect(() => {
     loadSongs();
-    // Removida la suscripción en tiempo real para evitar duplicados
-    // La lista se actualiza manualmente cuando se envía una canción
   }, []);
 
   const loadSongs = async () => {
     try {
       setLoadingSongs(true);
-      // Cargar TODAS las canciones sin filtro de aprobación
       const { data, error } = await supabase
         .from("song_requests")
         .select("*")
@@ -56,7 +66,7 @@ export default function MusicRequests() {
 
     try {
       setLoading(true);
-      setError(""); // Limpiar errores previos
+      setError("");
 
       const { data, error } = await supabase
         .from("song_requests")
@@ -75,22 +85,22 @@ export default function MusicRequests() {
         throw error;
       }
 
-      // Actualizar la lista local inmediatamente
       if (data && data[0]) {
         setDbSongs((prev) => [data[0], ...prev]);
       }
 
-      // Mostrar mensaje de éxito PERMANENTE (hasta refrescar página)
       setSubmitted(true);
-
-      // Limpiar formulario pero NO resetear submitted
       setSongRequest("");
       setArtistRequest("");
       setMessage("");
+
+      // Cerrar formulario después de enviar
+      setTimeout(() => {
+        setShowForm(false);
+      }, 2000);
     } catch (error) {
       console.error("Error submitting song:", error);
 
-      // Mostrar error más específico
       let errorMessage = "Hubo un error al enviar tu solicitud. ";
 
       if (error.code === "PGRLS0001" || error.message?.includes("RLS")) {
@@ -105,267 +115,391 @@ export default function MusicRequests() {
       }
 
       setError(errorMessage);
-      // NO cambiar submitted a true si hay error, permitir intentar de nuevo
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section
-      id="music"
-      className="py-20 bg-gradient-to-r from-quince-50 to-quince-400"
-    >
-      {/* Custom scrollbar styles */}
-      <style jsx global>{`
-        .message-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: #f472b6 #fdf2f8;
-        }
-        .message-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .message-scrollbar::-webkit-scrollbar-track {
-          background: #fdf2f8;
-          border-radius: 10px;
-        }
-        .message-scrollbar::-webkit-scrollbar-thumb {
-          background: #f472b6;
-          border-radius: 10px;
-        }
-        .message-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #ec4899;
-        }
-      `}</style>
+    <section id="music" className="relative min-h-screen overflow-hidden">
+      {/* Background image - Left 50% */}
+      <div className="absolute inset-0 lg:w-1/2 lg:left-0">
+        <div
+          className="w-full h-full"
+          style={{
+            backgroundImage: `url('/assets/background.jpg')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        ></div>
+      </div>
 
-      <div className="max-w-6xl mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <Music className="w-12 h-12 mx-auto text-quince-500 mb-4" />
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            Pide tu Canción Favorita
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Ayúdanos a crear la playlist perfecta. ¡Tu canción favorita puede
-            ser la que haga bailar a todos!
-          </p>
-        </motion.div>
+      {/* Desktop: K-pop inspired gradient on right 50% */}
+      <div className="hidden lg:block absolute inset-y-0 right-0 w-1/2 bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900"></div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Request Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="glass rounded-3xl p-8"
-          >
-            <h3 className="font-serif text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-              <Headphones className="w-8 h-8 text-quince-500" />
-              Solicita una Canción
-            </h3>
+      {/* Mobile overlay */}
+      <div className="lg:hidden absolute inset-0 bg-gradient-to-br from-purple-900/80 via-pink-900/80 to-indigo-900/80"></div>
 
-            {!submitted ? (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {error && (
-                  <div className="p-4 bg-red-100 border border-red-300 rounded-xl flex items-center gap-2 text-red-700">
-                    <AlertCircle className="w-5 h-5" />
-                    <span>{error}</span>
-                  </div>
-                )}
+      {/* Floating K-pop themed particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(15)].map((_, i) => {
+          const icons = [Heart, Star, Sparkles];
+          const Icon = icons[i % icons.length];
+          const colors = [
+            "text-pink-300",
+            "text-purple-300",
+            "text-yellow-300",
+          ];
+          const color = colors[i % colors.length];
 
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Nombre de la Canción *
-                  </label>
-                  <input
-                    type="text"
-                    value={songRequest}
-                    onChange={(e) => setSongRequest(e.target.value)}
-                    className="w-full px-4 py-3 border border-white rounded-xl focus:ring-2 focus:ring-quince-500 focus:border-transparent transition-all"
-                    placeholder="Ej: Soy Cordobés"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Artista
-                  </label>
-                  <input
-                    type="text"
-                    value={artistRequest}
-                    onChange={(e) => setArtistRequest(e.target.value)}
-                    className="w-full px-4 py-3 border border-white rounded-xl focus:ring-2 focus:ring-quince-500 focus:border-transparent transition-all"
-                    placeholder="Ej: Rodrigo"
-                    disabled={loading}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Mensaje Especial (Opcional)
-                  </label>
-                  <textarea
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-white rounded-xl focus:ring-2 focus:ring-quince-500 focus:border-transparent transition-all resize-none"
-                    placeholder="¿Por qué es especial esta canción para ti?"
-                    disabled={loading}
-                  />
-                </div>
-
-                <motion.button
-                  type="submit"
-                  whileHover={{ scale: loading ? 1 : 1.05 }}
-                  whileTap={{ scale: loading ? 1 : 0.95 }}
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-quince-500 to-quince-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {loading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <Send className="w-5 h-5" />
-                  )}
-                  {loading ? "Enviando..." : "Enviar Solicitud"}
-                </motion.button>
-              </form>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-8"
-              >
-                <Heart className="w-16 h-16 text-quince-500 mx-auto mb-4" />
-                <h4 className="font-serif text-2xl font-bold text-gray-800 mb-2">
-                  ¡Canción Agregada Exitosamente!
-                </h4>
-                <p className="text-gray-600 mb-4">
-                  Tu canción aparece ahora en la lista Canciones Solicitadas.
-                  ¡Esperamos que suene durante la fiesta!
-                </p>
-                <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
-                  🎵 Una canción por persona. Para agregar otra, recarga la
-                  página.
-                </p>
-              </motion.div>
-            )}
-          </motion.div>
-
-          {/* Songs Lists */}
-          <div className="space-y-8">
-            {/* Canciones solicitadas por usuarios */}
+          return (
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="glass rounded-3xl p-8"
+              key={i}
+              className={`absolute ${color}`}
+              initial={{
+                x:
+                  Math.random() *
+                  (typeof window !== "undefined" ? window.innerWidth : 1200),
+                y:
+                  typeof window !== "undefined" ? window.innerHeight + 10 : 800,
+                opacity: 0,
+                rotate: 0,
+              }}
+              animate={{
+                y: -50,
+                opacity: [0, 1, 1, 0],
+                rotate: 360,
+                x:
+                  Math.random() *
+                  (typeof window !== "undefined" ? window.innerWidth : 1200),
+              }}
+              transition={{
+                duration: Math.random() * 8 + 12,
+                repeat: Infinity,
+                ease: "linear",
+                delay: Math.random() * 8,
+              }}
             >
-              <h3 className="font-serif text-2xl font-bold text-gray-800 mb-6 flex items-center justify-between">
-                <span>Canciones Solicitadas</span>
-                <span className="text-sm bg-quince-100 text-quince-800 px-3 py-1 rounded-full">
-                  {dbSongs.length}{" "}
-                  {dbSongs.length === 1 ? "canción" : "canciones"}
-                </span>
-              </h3>
+              <Icon className="w-6 h-6" />
+            </motion.div>
+          );
+        })}
+      </div>
 
-              {loadingSongs ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-8 h-8 animate-spin text-quince-500" />
-                </div>
-              ) : dbSongs.length > 0 ? (
-                <div
-                  className="space-y-3 overflow-y-auto message-scrollbar pr-2"
+      <div className="relative z-10 min-h-screen flex items-center">
+        <div className="w-full mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-0 min-h-screen lg:h-screen">
+            {/* Left side - Title and intro (over image) */}
+            <div className="flex items-center justify-center">
+              <motion.div
+                initial={{ opacity: 0, x: -100 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1.2, ease: "easeOut" }}
+                viewport={{ once: true }}
+                className="text-center lg:text-left lg:pl-12"
+              >
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  whileInView={{ scale: 1, rotate: 0 }}
+                  transition={{
+                    duration: 1,
+                    delay: 0.3,
+                    type: "spring",
+                    bounce: 0.6,
+                  }}
+                  viewport={{ once: true }}
+                  className="relative inline-flex items-center justify-center mb-8"
+                >
+                  <div className="absolute inset-0 animate-pulse">
+                    <div className="w-24 h-24 bg-gradient-to-br from-pink-400/50 to-purple-400/50 rounded-full blur-2xl"></div>
+                  </div>
+                  <Music className="relative w-20 h-20 text-white drop-shadow-2xl" />
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    className="absolute -top-3 -right-3"
+                  >
+                    <Sparkles className="w-8 h-8 text-yellow-300" />
+                  </motion.div>
+                </motion.div>
+
+                <motion.h2
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.5 }}
+                  viewport={{ once: true }}
+                  className="font-bold text-5xl md:text-6xl lg:text-7xl text-white mb-6 leading-tight"
                   style={{
-                    height: "240px", // Altura fija para aproximadamente 3 canciones
+                    textShadow:
+                      "0 0 30px rgba(236, 72, 153, 0.8), 0 0 60px rgba(168, 85, 247, 0.6)",
+                    background:
+                      "linear-gradient(135deg, #ec4899, #a855f7, #06b6d4)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
                   }}
                 >
-                  <AnimatePresence>
-                    {dbSongs.map((song, index) => (
-                      <motion.div
-                        key={song.id}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.3 }}
-                        className="p-3 bg-white/70 rounded-xl hover:bg-white/90 transition-all cursor-pointer group"
+                  Pide tu Canción
+                  <br />
+                  <span className="text-4xl md:text-5xl lg:text-6xl">
+                    K-Favorita
+                  </span>
+                </motion.h2>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.7 }}
+                  viewport={{ once: true }}
+                  className="text-xl text-white/90 max-w-lg mx-auto lg:mx-0 mb-8 font-medium drop-shadow-lg"
+                >
+                  🎵 Crea la playlist perfecta para los 15 de Nahiara
+                  <br />
+                  ¡Que suene tu canción favorita! ✨
+                </motion.p>
+              </motion.div>
+            </div>
+
+            {/* Right side - Interactive area (black gradient) */}
+            <div className="flex items-center justify-center py-12 lg:py-0">
+              <div className="w-full max-w-lg">
+                <AnimatePresence mode="wait">
+                  {!showForm ? (
+                    <motion.div
+                      key="main-buttons"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.5 }}
+                      className="space-y-8"
+                    >
+                      {/* Main CTA Button */}
+                      <motion.button
+                        onClick={() => setShowForm(true)}
+                        whileHover={{
+                          scale: 1.05,
+                          boxShadow: "0 0 50px rgba(236, 72, 153, 0.8)",
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                        className="relative w-full h-20 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl font-bold text-xl text-white shadow-2xl overflow-hidden group"
+                        style={{
+                          boxShadow: "0 0 40px rgba(236, 72, 153, 0.6)",
+                        }}
                       >
-                        <div className="flex items-start gap-3">
-                          <Music className="w-4 h-4 text-quince-400 flex-shrink-0 mt-1 group-hover:text-quince-600 transition-colors" />
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-gray-800 truncate group-hover:text-quince-700 transition-colors">
-                              {song.song_name}
-                            </p>
-                            {song.artist_name && (
-                              <p className="text-sm text-gray-600 truncate">
-                                {song.artist_name}
-                              </p>
-                            )}
-                            {song.message && (
-                              <div
-                                className="text-xs text-gray-500 mt-1 italic message-scrollbar overflow-y-auto"
-                                style={{ maxHeight: "40px" }}
-                                title={song.message}
-                              >
-                                {song.message}
-                              </div>
-                            )}
-                            <p className="text-xs text-gray-400 mt-1">
-                              {new Date(song.created_at).toLocaleDateString(
-                                "es-ES",
-                                {
-                                  day: "numeric",
-                                  month: "short",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                }
-                              )}
-                            </p>
-                          </div>
+                        <motion.div
+                          animate={{ x: ["-100%", "100%"] }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
+                        />
+                        <div className="relative z-10 flex items-center justify-center gap-3">
+                          <Plus className="w-8 h-8" />
+                          Agregar Mi Canción
+                        </div>
+                      </motion.button>
+
+                      {/* Songs Counter */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-center"
+                      >
+                        <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
+                          <Volume2 className="w-6 h-6 text-purple-300" />
+                          <span className="text-white font-semibold text-lg">
+                            {getSongsCountText(dbSongs.length)} agregadas
+                          </span>
                         </div>
                       </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <Music className="w-12 h-12 text-quince-50 mx-auto mb-4" />
-                  <p className="text-quince-50">
-                    Aún no hay canciones solicitadas. ¡Sé el primero!
-                  </p>
-                </div>
-              )}
 
-              {/* Indicador visual de más canciones */}
-              {dbSongs.length > 3 && (
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
-                    <span>Desliza para ver más canciones</span>
-                    <svg
-                      className="w-4 h-4 animate-bounce"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                      {/* Songs Preview */}
+                      <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
+                        <h3 className="text-white font-bold text-xl mb-4 flex items-center gap-2">
+                          <Headphones className="w-6 h-6 text-purple-300" />
+                          Últimas Canciones
+                        </h3>
+
+                        {loadingSongs ? (
+                          <div className="flex items-center justify-center py-8">
+                            <Loader2 className="w-8 h-8 animate-spin text-purple-300" />
+                          </div>
+                        ) : dbSongs.length > 0 ? (
+                          <div className="space-y-3 max-h-60 overflow-y-auto">
+                            {dbSongs.slice(0, 4).map((song, index) => (
+                              <motion.div
+                                key={song.id}
+                                initial={{ opacity: 0, x: 30 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className="flex items-center gap-3 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all group"
+                              >
+                                <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full flex-shrink-0 group-hover:scale-150 transition-transform"></div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-white font-medium truncate">
+                                    {song.song_name}
+                                  </p>
+                                  {song.artist_name && (
+                                    <p className="text-purple-200 text-sm truncate">
+                                      {song.artist_name}
+                                    </p>
+                                  )}
+                                </div>
+                              </motion.div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-white/60 text-center py-4">
+                            ¡Sé el primero en agregar una canción! 🎤
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="form"
+                      initial={{ opacity: 0, scale: 0.8, rotateX: -90 }}
+                      animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+                      exit={{ opacity: 0, scale: 0.8, rotateX: 90 }}
+                      transition={{
+                        duration: 0.6,
+                        type: "spring",
+                        bounce: 0.3,
+                      }}
+                      className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 relative overflow-hidden shadow-2xl"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                      />
-                    </svg>
-                  </p>
-                </div>
-              )}
-            </motion.div>
+                      {/* Close button */}
+                      <motion.button
+                        onClick={() => setShowForm(false)}
+                        whileHover={{ scale: 1.1, rotate: 90 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all"
+                      >
+                        <X className="w-5 h-5" />
+                      </motion.button>
+
+                      <div className="mb-6">
+                        <h3 className="text-white font-bold text-2xl flex items-center gap-3">
+                          <Music className="w-8 h-8 text-purple-300" />
+                          Tu Canción K-Pop
+                        </h3>
+                      </div>
+
+                      {!submitted ? (
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                          {error && (
+                            <motion.div
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="p-4 bg-red-500/20 border border-red-400/50 rounded-xl flex items-center gap-2 text-red-200"
+                            >
+                              <AlertCircle className="w-5 h-5" />
+                              <span>{error}</span>
+                            </motion.div>
+                          )}
+
+                          <div>
+                            <label className="block text-white font-medium mb-2">
+                              Nombre de la Canción *
+                            </label>
+                            <input
+                              type="text"
+                              value={songRequest}
+                              onChange={(e) => setSongRequest(e.target.value)}
+                              className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all backdrop-blur-sm"
+                              placeholder="Ej: Dynamite, IDOL, etc..."
+                              required
+                              disabled={loading}
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-white font-medium mb-2">
+                              Artista
+                            </label>
+                            <input
+                              type="text"
+                              value={artistRequest}
+                              onChange={(e) => setArtistRequest(e.target.value)}
+                              className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all backdrop-blur-sm"
+                              placeholder="Ej: BTS, BLACKPINK, etc..."
+                              disabled={loading}
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-white font-medium mb-2">
+                              Mensaje Especial (Opcional)
+                            </label>
+                            <textarea
+                              value={message}
+                              onChange={(e) => setMessage(e.target.value)}
+                              rows={3}
+                              className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all resize-none backdrop-blur-sm"
+                              placeholder="¿Por qué es especial esta canción para Sofia?"
+                              disabled={loading}
+                            />
+                          </div>
+
+                          <motion.button
+                            type="submit"
+                            whileHover={{ scale: loading ? 1 : 1.02 }}
+                            whileTap={{ scale: loading ? 1 : 0.98 }}
+                            disabled={loading}
+                            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl"
+                            style={{
+                              boxShadow: loading
+                                ? ""
+                                : "0 0 30px rgba(236, 72, 153, 0.5)",
+                            }}
+                          >
+                            {loading ? (
+                              <Loader2 className="w-6 h-6 animate-spin" />
+                            ) : (
+                              <Send className="w-6 h-6" />
+                            )}
+                            {loading
+                              ? "Enviando..."
+                              : "¡Agregar a la Playlist!"}
+                          </motion.button>
+                        </form>
+                      ) : (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="text-center py-8"
+                        >
+                          <motion.div
+                            animate={{
+                              scale: [1, 1.2, 1],
+                              rotate: [0, 10, -10, 0],
+                            }}
+                            transition={{ duration: 0.6, repeat: 2 }}
+                          >
+                            <Heart className="w-20 h-20 text-pink-400 mx-auto mb-4" />
+                          </motion.div>
+                          <h4 className="text-white font-bold text-2xl mb-3">
+                            ¡Canción Agregada! 🎉
+                          </h4>
+                          <p className="text-purple-200 mb-4">
+                            Tu canción ya está en la playlist de Sofia.
+                            ¡Esperamos que suene toda la noche! 💫
+                          </p>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
           </div>
         </div>
       </div>
