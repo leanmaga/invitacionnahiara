@@ -3,7 +3,7 @@ import {
   Inter,
   Playfair_Display,
   Cookie,
-  Dancing_Script,
+  Imperial_Script,
 } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -11,10 +11,12 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-serif",
 });
-const dancing = Dancing_Script({
+const dancing = Imperial_Script({
+  weight: "400",
   subsets: ["latin"],
-  variable: "--font-elegant",
+  variable: "--font-dancing",
 });
+
 const coockie = Cookie({
   subsets: ["latin"],
   weight: ["400"],

@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  /* 🟣 Paleta Lila - Color principal de la quinceañera */
-  --color-quince-50: #faf5ff;
-  --color-quince-100: #f3e8ff;
-  --color-quince-200: #e9d5ff;
-  --color-quince-300: #d8b4fe;
+  /* 🟣 Paleta Lila - Color principal de la quinceañera faf5ff f3e8ff e9d5ff d8b4fe*/
+  --color-quince-50: #dde7c7;
+  --color-quince-100: #edeec9;
+  --color-quince-200: #bfae48;
+  --color-quince-300: #cbbf7a;
   --color-quince-400: #c084fc;
   --color-quince-500: #a855f7;
   --color-quince-600: #9333ea;

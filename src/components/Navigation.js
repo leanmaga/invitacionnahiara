@@ -56,8 +56,8 @@ export default function Navigation() {
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${
           scrolled
-            ? "glass shadow-lg backdrop-blur-md bg-white/80"
-            : "bg-white/90 backdrop-blur-sm"
+            ? "shadow-lg backdrop-blur-md bg-amber-50/90 border-b border-amber-200/50"
+            : "bg-amber-50/80 backdrop-blur-sm border-b border-amber-100/30"
         }`}
       >
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,7 +65,11 @@ export default function Navigation() {
             {/* Logo */}
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="font-coockie text-xl sm:text-2xl md:text-3xl font-bold text-quince-400 flex-shrink-0"
+              className="font-coockie text-xl sm:text-2xl md:text-3xl font-bold text-amber-600 flex-shrink-0"
+              style={{
+                textShadow: "0 0 10px #fbbf24, 0 0 20px #f59e0b",
+                fontFamily: "var(--font-dancing)",
+              }}
             >
               {nombreQuinceanera}
             </motion.div>
@@ -81,9 +85,9 @@ export default function Navigation() {
                   transition={{ delay: index * 0.1 }}
                   whileHover={{
                     scale: 1.05,
-                    color: "var(--color-purple-500)",
+                    textShadow: "0 0 8px #fbbf24",
                   }}
-                  className="text-gray-700 hover:text-purple-500 font-medium transition-colors text-sm lg:text-base whitespace-nowrap px-3 py-2"
+                  className="text-amber-800 hover:text-amber-600 font-semibold transition-all text-sm lg:text-base whitespace-nowrap px-3 py-2 rounded-lg hover:bg-amber-100/50"
                 >
                   {item.name}
                 </motion.a>
@@ -112,7 +116,10 @@ export default function Navigation() {
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(!isOpen)}
-                className="text-gray-700 hover:text-purple-500 p-2 rounded-lg hover:bg-purple-50 transition-colors"
+                className="text-amber-800 hover:text-amber-600 p-2 rounded-lg hover:bg-amber-100/50 transition-all"
+                style={{
+                  boxShadow: "0 2px 8px rgba(251, 191, 36, 0.3)",
+                }}
               >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
               </motion.button>
@@ -130,7 +137,7 @@ export default function Navigation() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsOpen(false)}
-                className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm"
+                className="md:hidden fixed inset-0 bg-amber-900/20 backdrop-blur-sm"
                 style={{ top: "64px" }}
               />
 
@@ -140,7 +147,10 @@ export default function Navigation() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.2 }}
-                className="md:hidden absolute top-full left-0 right-0 w-full bg-white/95 backdrop-blur-md shadow-lg border-t border-gray-200"
+                className="md:hidden absolute top-full left-0 right-0 w-full bg-amber-50/95 backdrop-blur-md shadow-lg border-t border-amber-200/50"
+                style={{
+                  boxShadow: "0 8px 32px rgba(251, 191, 36, 0.3)",
+                }}
               >
                 <div className="px-4 py-4 space-y-1">
                   {navItems.map((item, index) => (
@@ -151,7 +161,14 @@ export default function Navigation() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                       onClick={handleLinkClick}
-                      className="block py-3 px-3 text-gray-700 hover:text-purple-500 hover:bg-purple-50 font-medium rounded-lg transition-all"
+                      whileHover={{
+                        scale: 1.02,
+                        textShadow: "0 0 8px #fbbf24",
+                      }}
+                      className="block py-3 px-3 text-amber-800 hover:text-amber-600 hover:bg-amber-100/60 font-semibold rounded-lg transition-all"
+                      style={{
+                        backdropFilter: "blur(10px)",
+                      }}
                     >
                       {item.name}
                     </motion.a>
@@ -162,15 +179,47 @@ export default function Navigation() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: navItems.length * 0.1 }}
-                    className="pt-2 mt-2 border-t border-gray-200"
+                    className="pt-2 mt-2 border-t border-amber-400/40"
                   >
-                    <div className="py-2 px-3 text-gray-500 text-sm font-medium flex items-center gap-2">
+                    <div
+                      className="py-2 px-3 text-amber-200 text-sm font-semibold flex items-center gap-2"
+                      style={{
+                        textShadow:
+                          "0 0 8px rgba(251, 191, 36, 0.4), 1px 1px 2px rgba(0,0,0,0.3)",
+                      }}
+                    >
                       <motion.div
-                        animate={{ rotate: [0, 360] }}
+                        animate={{
+                          rotate: [0, 360],
+                          color: [
+                            "#fcd34d",
+                            "#fbbf24",
+                            "#f59e0b",
+                            "#eab308",
+                            "#fcd34d",
+                          ],
+                          filter: [
+                            "drop-shadow(0 0 8px #fbbf24)",
+                            "drop-shadow(0 0 12px #f59e0b)",
+                            "drop-shadow(0 0 8px #fbbf24)",
+                          ],
+                        }}
                         transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                          ease: "linear",
+                          rotate: {
+                            duration: 3,
+                            repeat: Infinity,
+                            ease: "linear",
+                          },
+                          color: {
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          },
+                          filter: {
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          },
                         }}
                       >
                         <Music size={16} />
