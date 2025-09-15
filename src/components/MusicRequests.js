@@ -203,9 +203,6 @@ export default function MusicRequests() {
             backgroundRepeat: "no-repeat",
           }}
         >
-          {/* Overlay oscuro */}
-          {/* <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-pink-900/80 to-indigo-900/80"></div> */}
-
           {/* Contenido del hero */}
           <div className="relative z-10 text-center max-w-lg mx-auto px-6">
             {/* Icono musical animado */}
