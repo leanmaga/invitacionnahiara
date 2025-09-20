@@ -10,9 +10,6 @@ import {
   CheckCircle,
   Sparkles,
   Calendar,
-  MessageSquare,
-  Flower2,
-  Sun,
 } from "lucide-react";
 
 export default function RSVPSection() {
@@ -27,8 +24,9 @@ export default function RSVPSection() {
   const [error, setError] = useState("");
   const [existingRSVP, setExistingRSVP] = useState(null);
   const [checkingExisting, setCheckingExisting] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
 
-  // Configuración - reemplaza con tu hook useQuinceaneraConfig()
+  // Configuración
   const nombre = "Sofia";
   const whatsapp = "5493511234567";
   const telefono = "(351) 123-4567";
@@ -49,6 +47,7 @@ export default function RSVPSection() {
 
         if (existing) {
           setSubmitted(true);
+          setIsFlipped(false);
         }
       } else {
         setExistingRSVP(null);
@@ -68,6 +67,7 @@ export default function RSVPSection() {
     if (e.target.name === "name" && !e.target.value.trim()) {
       setSubmitted(false);
       setExistingRSVP(null);
+      setIsFlipped(false);
     }
   };
 
@@ -108,6 +108,7 @@ export default function RSVPSection() {
     if (existing) {
       setExistingRSVP(existing);
       setSubmitted(true);
+      setIsFlipped(false);
       return;
     }
 
@@ -118,6 +119,7 @@ export default function RSVPSection() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       sendToWhatsApp(formData);
       setSubmitted(true);
+      setIsFlipped(false); // Resetear el flip cuando se envía
     } catch (error) {
       console.error("Error submitting RSVP:", error);
       setError(
@@ -125,6 +127,7 @@ export default function RSVPSection() {
       );
       sendToWhatsApp(formData);
       setSubmitted(true);
+      setIsFlipped(false); // También resetear en caso de error
     } finally {
       setLoading(false);
     }
@@ -155,6 +158,55 @@ export default function RSVPSection() {
       animation: bounceArrow 2s infinite;
     }
 
+    /* Efecto 3D Flip Card */
+    .flip-card {
+      perspective: 1000px;
+      width: 100%;
+      height: 100vh;
+    }
+    
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transform-style: preserve-3d;
+    }
+    
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+    
+    .flip-card-back {
+      transform: rotateY(180deg);
+    }
+
+    .golden-button {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
+      box-shadow: 0 8px 32px rgba(251, 191, 36, 0.3);
+      animation: pulseGolden 2s infinite;
+    }
+
+    @keyframes pulseGolden {
+      0%, 100% { 
+        box-shadow: 0 8px 32px rgba(251, 191, 36, 0.3);
+        transform: scale(1);
+      }
+      50% { 
+        box-shadow: 0 12px 40px rgba(251, 191, 36, 0.5);
+        transform: scale(1.05);
+      }
+    }
+
     @keyframes fadeInUp {
       to { opacity: 1; transform: translateY(0); }
     }
@@ -170,8 +222,8 @@ export default function RSVPSection() {
       to { transform: rotate(360deg); }
     }
     @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.5); }
-      50% { box-shadow: 0 0 40px rgba(245, 158, 11, 0.8); }
+      0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(251, 191, 36, 0.8); }
     }
     @keyframes bounceArrow {
       0%, 100% { transform: translateY(0); }
@@ -199,30 +251,29 @@ export default function RSVPSection() {
               backgroundRepeat: "no-repeat",
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-800/90 via-orange-800/90 to-yellow-700/90"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/90 via-amber-50/85 to-yellow-100/80"></div>
 
             <div className="relative z-10 text-center max-w-lg mx-auto px-6 fade-in-up">
               <div className="flex justify-center mb-8">
                 <div className="bounce-icon">
                   {isExisting ? (
-                    <CheckCircle className="w-20 h-20 text-amber-400" />
+                    <CheckCircle className="w-20 h-20 text-yellow-600" />
                   ) : (
-                    <Heart className="w-20 h-20 text-orange-400" />
+                    <Heart className="w-20 h-20 text-yellow-600" />
                   )}
                 </div>
               </div>
 
               <h2
-                className="font-bold text-4xl sm:text-5xl text-amber-100 mb-6 leading-tight"
+                className="font-bold text-4xl sm:text-5xl text-yellow-800 mb-6 leading-tight"
                 style={{
-                  textShadow:
-                    "0 0 30px rgba(245, 158, 11, 0.8), 0 0 60px rgba(251, 146, 60, 0.6)",
+                  textShadow: "0 4px 20px rgba(217, 119, 6, 0.3)",
                 }}
               >
                 {isExisting ? "¡Ya Confirmaste!" : "¡Confirmación Enviada!"}
               </h2>
 
-              <p className="text-lg text-white/90 max-w-lg mx-auto mb-8 font-medium drop-shadow-lg">
+              <p className="text-lg text-yellow-900/80 max-w-lg mx-auto mb-8 font-medium">
                 {isExisting
                   ? `Hola ${rsvpData.name}, ya confirmaste tu asistencia para la fiesta de ${nombre}. ¡Te esperamos!`
                   : `Tu confirmación se envió por WhatsApp. ¡No podemos esperar a celebrar contigo en la fiesta de ${nombre}!`}
@@ -232,6 +283,7 @@ export default function RSVPSection() {
                 onClick={() => {
                   setSubmitted(false);
                   setExistingRSVP(null);
+                  setIsFlipped(false);
                   setFormData({
                     name: "",
                     phone: "",
@@ -239,7 +291,7 @@ export default function RSVPSection() {
                     message: "",
                   });
                 }}
-                className="bg-gradient-to-r from-white/20 to-white/30 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:scale-105"
+                className="bg-gradient-to-r from-yellow-200/80 to-yellow-300/80 text-yellow-800 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-yellow-400/30 hover:scale-105"
               >
                 Confirmar otra persona
               </button>
@@ -260,7 +312,7 @@ export default function RSVPSection() {
               }}
             ></div>
           </div>
-          <div className="absolute inset-0 lg:w-1/2 lg:right-1/2 bg-gradient-to-br from-amber-800 via-orange-800 to-yellow-700"></div>
+          <div className="absolute inset-0 lg:w-1/2 lg:right-1/2 bg-gradient-to-br from-yellow-50 via-amber-50 to-yellow-100"></div>
 
           <div className="relative z-10 h-screen flex items-center">
             <div className="w-full h-full">
@@ -270,18 +322,17 @@ export default function RSVPSection() {
                     <div className="flex justify-center mb-8">
                       <div className="bounce-icon">
                         {isExisting ? (
-                          <CheckCircle className="w-24 h-24 text-amber-400" />
+                          <CheckCircle className="w-24 h-24 text-yellow-600" />
                         ) : (
-                          <Heart className="w-24 h-24 text-orange-400" />
+                          <Heart className="w-24 h-24 text-yellow-600" />
                         )}
                       </div>
                     </div>
 
                     <h2
-                      className="font-bold text-5xl md:text-6xl text-amber-100 mb-6 leading-tight"
+                      className="font-bold text-5xl md:text-6xl text-yellow-800 mb-6 leading-tight"
                       style={{
-                        textShadow:
-                          "0 0 30px rgba(245, 158, 11, 0.8), 0 0 60px rgba(251, 146, 60, 0.6)",
+                        textShadow: "0 4px 20px rgba(217, 119, 6, 0.3)",
                       }}
                     >
                       {isExisting
@@ -289,7 +340,7 @@ export default function RSVPSection() {
                         : "¡Confirmación Enviada!"}
                     </h2>
 
-                    <p className="text-xl text-white/90 max-w-lg mx-auto mb-8 font-medium drop-shadow-lg">
+                    <p className="text-xl text-yellow-900/80 max-w-lg mx-auto mb-8 font-medium">
                       {isExisting
                         ? `Hola ${rsvpData.name}, ya confirmaste tu asistencia para la fiesta de ${nombre}. ¡Te esperamos!`
                         : `Tu confirmación se envió por WhatsApp. ¡No podemos esperar a celebrar contigo en la fiesta de ${nombre}!`}
@@ -299,6 +350,7 @@ export default function RSVPSection() {
                       onClick={() => {
                         setSubmitted(false);
                         setExistingRSVP(null);
+                        setIsFlipped(false);
                         setFormData({
                           name: "",
                           phone: "",
@@ -306,7 +358,7 @@ export default function RSVPSection() {
                           message: "",
                         });
                       }}
-                      className="bg-gradient-to-r from-white/20 to-white/30 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:scale-105"
+                      className="bg-gradient-to-r from-yellow-200/80 to-yellow-300/80 text-yellow-800 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm border border-yellow-400/30 hover:scale-105"
                     >
                       Confirmar otra persona
                     </button>
@@ -328,188 +380,200 @@ export default function RSVPSection() {
 
       {/* LAYOUT MÓVIL */}
       <div className="lg:hidden">
-        {/* Primera sección: Hero con imagen de fondo (100vh) */}
-        <div
-          className="relative h-screen w-full flex items-center justify-center"
-          style={{
-            backgroundImage: `url('/assets/background2.webp')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-800/90 via-orange-800/90 to-yellow-700/90"></div>
-
-          <div className="relative z-10 text-center max-w-lg mx-auto px-6 fade-in-up">
-            <div className="relative inline-flex items-center justify-center mb-8">
-              <div className="absolute inset-0 pulse-glow">
-                <div className="w-24 h-24 bg-gradient-to-br from-amber-400/50 to-orange-400/50 rounded-full blur-2xl"></div>
-              </div>
-              <Send className="relative w-12 h-12 text-white drop-shadow-2xl" />
-              <div className="absolute -top-2 -right-2 rotate-sparkles">
-                <Sparkles className="w-6 h-6 text-amber-300" />
-              </div>
-            </div>
-
-            <h2
-              className="font-bold text-4xl sm:text-5xl text-white mb-6 leading-tight"
-              style={{
-                textShadow:
-                  "0 0 30px rgba(245, 158, 11, 0.8), 0 0 60px rgba(251, 146, 60, 0.6)",
-                background:
-                  "linear-gradient(135deg, #f59e0b, #f97316, #eab308)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Confirma tu
-              <br />
-              <span className="text-3xl sm:text-4xl">Asistencia</span>
-            </h2>
-
-            <p className="text-lg text-white/90 mb-8 font-medium drop-shadow-lg">
-              Confirma antes del{" "}
-              <span className="font-bold text-amber-300">
-                {fechaLimiteRSVP.split(",")[0]}
-              </span>
-              <br />
-              para que podamos preparar la fiesta perfecta de {nombre}
-            </p>
-
-            <div className="mt-6 bounce-arrow">
-              <svg
-                className="w-6 h-6 text-white/60 mx-auto"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        <div className={`flip-card ${isFlipped ? "flipped" : ""}`}>
+          <div className="flip-card-inner">
+            {/* FRONT: Imagen con botón */}
+            <div className="flip-card-front">
+              <div
+                className="relative h-screen w-full flex items-center justify-center"
+                style={{
+                  backgroundImage: `url('/assets/background2.webp')`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                }}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-900/20 via-amber-800/30 to-yellow-700/40"></div>
 
-        {/* Segunda sección: Formulario (100vh) */}
-        <div
-          id="mobile-form-section"
-          className="h-screen bg-gradient-to-br from-amber-800 via-orange-800 to-yellow-700 flex items-center justify-center"
-        >
-          <div className="w-full max-w-lg px-6">
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl scale-in">
-              <div className="mb-4">
-                <h3 className="text-white font-bold text-lg flex items-center gap-2">
-                  <Send className="w-5 h-5" />
-                  Confirmar Asistencia
-                </h3>
-              </div>
+                <div className="relative z-10 text-center max-w-lg mx-auto px-6 fade-in-up">
+                  <div className="relative inline-flex items-center justify-center mb-8">
+                    <div className="absolute inset-0 pulse-glow">
+                      <div className="w-24 h-24 bg-gradient-to-br from-yellow-400/50 to-amber-500/50 rounded-full blur-2xl"></div>
+                    </div>
+                    <Send className="relative w-12 h-12 text-yellow-100 drop-shadow-lg" />
+                    <div className="absolute -top-2 -right-2 rotate-sparkles">
+                      <Sparkles className="w-6 h-6 text-yellow-300" />
+                    </div>
+                  </div>
 
-              {error && (
-                <div className="p-3 bg-red-500/20 border border-red-400/50 rounded-xl flex items-center gap-2 text-red-200 mb-4">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">{error}</span>
-                </div>
-              )}
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-white font-medium mb-2 flex items-center gap-2 text-sm">
-                    <User className="w-4 h-4 text-amber-300" />
-                    Nombre Completo *
-                    {checkingExisting && (
-                      <Loader2 className="w-3 h-3 animate-spin text-amber-300" />
-                    )}
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all text-sm"
-                    placeholder="Tu nombre completo"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-white font-medium mb-2 flex items-center gap-2 text-sm">
-                    <Phone className="w-4 h-4 text-orange-300" />
-                    Teléfono
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    disabled={loading}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all text-sm"
-                    placeholder={telefono}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-white font-medium mb-2 flex items-center gap-2 text-sm">
-                    <Utensils className="w-4 h-4 text-yellow-300" />
-                    Restricciones Alimentarias
-                  </label>
-                  <input
-                    type="text"
-                    name="dietary"
-                    value={formData.dietary}
-                    onChange={handleChange}
-                    disabled={loading}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all text-sm"
-                    placeholder="Vegetariano, sin gluten, alergias, etc."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-white font-medium mb-2 flex items-center gap-2 text-sm">
-                    <Heart className="w-4 h-4 text-amber-300" />
-                    Mensaje para {nombre}
-                  </label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    rows={2}
-                    disabled={loading}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none text-sm"
-                    placeholder={`Comparte tus mejores deseos para ${nombre}...`}
-                  />
-                </div>
-
-                <button
-                  onClick={handleSubmit}
-                  disabled={loading || !formData.name.trim()}
-                  className="w-full bg-gradient-to-r from-amber-500 via-orange-600 to-yellow-600 text-white px-4 py-3 rounded-xl font-bold text-sm hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 hover:scale-105"
-                >
-                  {loading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
-                  {loading ? "Enviando..." : "¡Confirmar Asistencia!"}
-                </button>
-
-                <div className="mt-4 p-3 bg-gradient-to-r from-white/5 to-white/10 rounded-xl border border-white/20">
-                  <p className="text-white/80 text-center text-xs">
-                    <Calendar className="inline w-3 h-3 mr-1" />
-                    <strong>Fecha límite:</strong> {fechaLimiteRSVP}
+                  <h2
+                    className="font-bold text-4xl sm:text-5xl mb-6 leading-tight text-yellow-100"
+                    style={{
+                      textShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
+                    }}
+                  >
+                    Confirma tu
                     <br />
-                    <Phone className="inline w-3 h-3 mr-1 mt-1" />
-                    Contacto: {telefono}
-                    <br />
-                    <span className="text-xs text-white/60 mt-1 block">
-                      Tu confirmación se enviará por WhatsApp automáticamente
+                    <span className="text-3xl sm:text-4xl">Asistencia</span>
+                  </h2>
+
+                  <p className="text-lg text-yellow-100/90 mb-12 font-medium drop-shadow-lg">
+                    Confirma antes del{" "}
+                    <span className="font-bold text-yellow-200">
+                      {fechaLimiteRSVP.split(",")[0]}
                     </span>
+                    <br />
+                    para que podamos preparar la fiesta perfecta de {nombre}
                   </p>
+
+                  {/* Botón dorado para voltear la tarjeta */}
+                  <button
+                    onClick={() => setIsFlipped(true)}
+                    className="golden-button text-yellow-900 px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center gap-3 mx-auto"
+                  >
+                    <Send className="w-6 h-6" />
+                    Confirmar Asistencia
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* BACK: Formulario */}
+            <div className="flip-card-back">
+              <div className="h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-yellow-100 flex items-center justify-center">
+                <div className="w-full max-w-lg px-6">
+                  <div className="bg-white/60 backdrop-blur-lg border border-yellow-300/40 rounded-3xl p-6 shadow-2xl scale-in">
+                    <div className="mb-4 flex items-center justify-between">
+                      <h3 className="text-yellow-800 font-bold text-lg flex items-center gap-2">
+                        <Send className="w-5 h-5" />
+                        Confirmar Asistencia
+                      </h3>
+                      {/* Botón para volver */}
+                      <button
+                        onClick={() => setIsFlipped(false)}
+                        className="text-yellow-600 hover:text-yellow-800 transition-colors"
+                      >
+                        <svg
+                          className="w-6 h-6"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {error && (
+                      <div className="p-3 bg-red-500/20 border border-red-400/50 rounded-xl flex items-center gap-2 text-red-700 mb-4">
+                        <AlertCircle className="w-4 h-4" />
+                        <span className="text-sm">{error}</span>
+                      </div>
+                    )}
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2 text-sm">
+                          <User className="w-4 h-4 text-yellow-600" />
+                          Nombre Completo *
+                          {checkingExisting && (
+                            <Loader2 className="w-3 h-3 animate-spin text-yellow-600" />
+                          )}
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
+                          disabled={loading}
+                          className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-xl text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all text-sm"
+                          placeholder="Tu nombre completo"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2 text-sm">
+                          <Phone className="w-4 h-4 text-yellow-600" />
+                          Teléfono
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          disabled={loading}
+                          className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-xl text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all text-sm"
+                          placeholder={telefono}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2 text-sm">
+                          <Utensils className="w-4 h-4 text-yellow-600" />
+                          Restricciones Alimentarias
+                        </label>
+                        <input
+                          type="text"
+                          name="dietary"
+                          value={formData.dietary}
+                          onChange={handleChange}
+                          disabled={loading}
+                          className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-xl text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all text-sm"
+                          placeholder="Vegetariano, sin gluten, alergias, etc."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2 text-sm">
+                          <Heart className="w-4 h-4 text-yellow-600" />
+                          Mensaje para {nombre}
+                        </label>
+                        <textarea
+                          name="message"
+                          value={formData.message}
+                          onChange={handleChange}
+                          rows={2}
+                          disabled={loading}
+                          className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-xl text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all resize-none text-sm"
+                          placeholder={`Comparte tus mejores deseos para ${nombre}...`}
+                        />
+                      </div>
+
+                      <button
+                        onClick={handleSubmit}
+                        disabled={loading || !formData.name.trim()}
+                        className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 text-yellow-900 px-4 py-3 rounded-xl font-bold text-sm hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 hover:scale-105"
+                      >
+                        {loading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Send className="w-4 h-4" />
+                        )}
+                        {loading ? "Enviando..." : "¡Confirmar Asistencia!"}
+                      </button>
+
+                      <div className="mt-4 p-3 bg-gradient-to-r from-yellow-100/80 to-amber-100/80 rounded-xl border border-yellow-300/40">
+                        <p className="text-yellow-800/80 text-center text-xs">
+                          <Calendar className="inline w-3 h-3 mr-1" />
+                          <strong>Fecha límite:</strong> {fechaLimiteRSVP}
+                          <br />
+                          <Phone className="inline w-3 h-3 mr-1 mt-1" />
+                          Contacto: {telefono}
+                          <br />
+                          <span className="text-xs text-yellow-700/60 mt-1 block">
+                            Tu confirmación se enviará por WhatsApp
+                            automáticamente
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -534,7 +598,7 @@ export default function RSVPSection() {
           ></div>
         </div>
 
-        <div className="absolute inset-0 lg:w-1/2 lg:right-1/2 bg-gradient-to-br from-amber-800 via-orange-800 to-yellow-700"></div>
+        <div className="absolute inset-0 lg:w-1/2 lg:right-1/2 bg-gradient-to-br from-yellow-50 via-amber-50 to-yellow-100"></div>
 
         <div className="relative z-10 h-screen flex items-center">
           <div className="w-full h-full">
@@ -544,24 +608,18 @@ export default function RSVPSection() {
                   <div className="text-center mb-8 fade-in-up">
                     <div className="relative inline-flex items-center justify-center mb-6">
                       <div className="absolute inset-0 pulse-glow">
-                        <div className="w-20 h-20 bg-gradient-to-br from-amber-400/50 to-orange-400/50 rounded-full blur-2xl"></div>
+                        <div className="w-20 h-20 bg-gradient-to-br from-yellow-400/50 to-amber-500/50 rounded-full blur-2xl"></div>
                       </div>
-                      <Send className="relative w-16 h-16 text-white drop-shadow-2xl" />
+                      <Send className="relative w-16 h-16 text-yellow-800 drop-shadow-lg" />
                       <div className="absolute -top-2 -right-2 rotate-sparkles">
-                        <Sparkles className="w-6 h-6 text-amber-300" />
+                        <Sparkles className="w-6 h-6 text-yellow-600" />
                       </div>
                     </div>
 
                     <h2
-                      className="font-bold text-4xl md:text-5xl lg:text-6xl text-white mb-4 leading-tight"
+                      className="font-bold text-4xl md:text-5xl lg:text-6xl mb-4 leading-tight text-yellow-800"
                       style={{
-                        textShadow:
-                          "0 0 30px rgba(245, 158, 11, 0.8), 0 0 60px rgba(251, 146, 60, 0.6)",
-                        background:
-                          "linear-gradient(135deg, #f59e0b, #f97316, #eab308)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
+                        textShadow: "0 4px 20px rgba(217, 119, 6, 0.3)",
                       }}
                     >
                       Confirma tu
@@ -569,19 +627,19 @@ export default function RSVPSection() {
                       Asistencia
                     </h2>
 
-                    <p className="text-lg text-white/90 max-w-lg mx-auto mb-6 font-medium drop-shadow-lg">
+                    <p className="text-lg text-yellow-900/80 max-w-lg mx-auto mb-6 font-medium">
                       Confirma antes del{" "}
-                      <span className="font-bold text-amber-300">
+                      <span className="font-bold text-yellow-700">
                         {fechaLimiteRSVP.split(",")[0]}
                       </span>{" "}
                       para que podamos preparar la fiesta perfecta de {nombre}
                     </p>
                   </div>
 
-                  <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl scale-in">
+                  <div className="bg-white/60 backdrop-blur-lg border border-yellow-300/40 rounded-3xl p-6 shadow-2xl scale-in">
                     <div>
                       {error && (
-                        <div className="p-3 bg-red-500/20 border border-red-400/50 rounded-xl flex items-center gap-2 text-red-200 mb-4">
+                        <div className="p-3 bg-red-500/20 border border-red-400/50 rounded-xl flex items-center gap-2 text-red-700 mb-4">
                           <AlertCircle className="w-4 h-4" />
                           <span className="text-sm">{error}</span>
                         </div>
@@ -589,11 +647,11 @@ export default function RSVPSection() {
 
                       <div className="grid md:grid-cols-2 gap-4 mb-4">
                         <div>
-                          <label className="block text-white font-medium mb-2 flex items-center gap-2">
-                            <User className="w-4 h-4 text-amber-300" />
+                          <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2">
+                            <User className="w-4 h-4 text-yellow-600" />
                             <span className="text-sm">Nombre Completo *</span>
                             {checkingExisting && (
-                              <Loader2 className="w-3 h-3 animate-spin text-amber-300" />
+                              <Loader2 className="w-3 h-3 animate-spin text-yellow-600" />
                             )}
                           </label>
                           <input
@@ -603,14 +661,14 @@ export default function RSVPSection() {
                             onChange={handleChange}
                             required
                             disabled={loading}
-                            className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
+                            className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-lg text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
                             placeholder="Tu nombre completo"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-white font-medium mb-2 flex items-center gap-2">
-                            <Phone className="w-4 h-4 text-orange-300" />
+                          <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2">
+                            <Phone className="w-4 h-4 text-yellow-600" />
                             <span className="text-sm">Teléfono</span>
                           </label>
                           <input
@@ -619,15 +677,15 @@ export default function RSVPSection() {
                             value={formData.phone}
                             onChange={handleChange}
                             disabled={loading}
-                            className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
+                            className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-lg text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
                             placeholder={telefono}
                           />
                         </div>
                       </div>
 
                       <div className="mb-4">
-                        <label className="block text-white font-medium mb-2 flex items-center gap-2">
-                          <Utensils className="w-4 h-4 text-yellow-300" />
+                        <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2">
+                          <Utensils className="w-4 h-4 text-yellow-600" />
                           <span className="text-sm">
                             Restricciones Alimentarias
                           </span>
@@ -638,14 +696,14 @@ export default function RSVPSection() {
                           value={formData.dietary}
                           onChange={handleChange}
                           disabled={loading}
-                          className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
+                          className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-lg text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
                           placeholder="Vegetariano, sin gluten, alergias, etc."
                         />
                       </div>
 
                       <div className="mb-6">
-                        <label className="block text-white font-medium mb-2 flex items-center gap-2">
-                          <Heart className="w-4 h-4 text-amber-300" />
+                        <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2">
+                          <Heart className="w-4 h-4 text-yellow-600" />
                           <span className="text-sm">
                             Mensaje Especial para {nombre}
                           </span>
@@ -656,7 +714,7 @@ export default function RSVPSection() {
                           onChange={handleChange}
                           rows={3}
                           disabled={loading}
-                          className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all resize-none backdrop-blur-sm disabled:opacity-50 text-sm"
+                          className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-lg text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all resize-none backdrop-blur-sm disabled:opacity-50 text-sm"
                           placeholder={`Comparte tus mejores deseos para ${nombre}...`}
                         />
                       </div>
@@ -664,11 +722,11 @@ export default function RSVPSection() {
                       <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-amber-500 via-orange-600 to-yellow-600 text-white px-6 py-3 rounded-xl font-bold text-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl hover:scale-105"
+                        className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 text-yellow-900 px-6 py-3 rounded-xl font-bold text-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl hover:scale-105"
                         style={{
                           boxShadow: loading
                             ? ""
-                            : "0 0 30px rgba(245, 158, 11, 0.5)",
+                            : "0 0 30px rgba(251, 191, 36, 0.4)",
                         }}
                       >
                         {loading ? (
@@ -684,15 +742,15 @@ export default function RSVPSection() {
                         )}
                       </button>
 
-                      <div className="mt-4 p-3 bg-gradient-to-r from-white/5 to-white/10 rounded-xl border border-white/20">
-                        <p className="text-white/80 text-center text-xs">
+                      <div className="mt-4 p-3 bg-gradient-to-r from-yellow-100/80 to-amber-100/80 rounded-xl border border-yellow-300/40">
+                        <p className="text-yellow-800/80 text-center text-xs">
                           <Calendar className="inline w-3 h-3 mr-1" />
                           <strong>Fecha límite:</strong> {fechaLimiteRSVP}
                           <br />
                           <Phone className="inline w-3 h-3 mr-1 mt-1" />
                           Contacto: {telefono}
                           <br />
-                          <span className="text-xs text-white/60 mt-1 block">
+                          <span className="text-xs text-yellow-700/60 mt-1 block">
                             Tu confirmación se enviará por WhatsApp
                             automáticamente
                           </span>
