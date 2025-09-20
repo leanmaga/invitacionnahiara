@@ -10,7 +10,7 @@ import RSVPSection from "@/components/RSVPSection";
 import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import { AudioProvider } from "@/components/AudioContext";
-import HorizontalGallery from "@/components/HorizontalGallery";
+import MasonryGallery from "@/components/MasonryGallery";
 
 export default function Home() {
   return (
@@ -29,7 +29,7 @@ export default function Home() {
             <HeroSection />
             <CountdownSection />
             <EventDetails />
-            <HorizontalGallery />
+            <MasonryGallery />
             <DressCode />
             <LocationSection />
             <MusicRequests />
