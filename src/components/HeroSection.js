@@ -138,7 +138,7 @@ export default function HeroSection() {
       id="hero"
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
       style={{
-        backgroundImage: `url('/assets/mobil.jpg')`,
+        backgroundImage: `url('/assets/1.png')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -148,7 +148,7 @@ export default function HeroSection() {
       <div
         className="absolute inset-0 hidden md:block"
         style={{
-          backgroundImage: `url('/assets/desktop.png')`,
+          backgroundImage: `url('/assets/6.png')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -156,8 +156,8 @@ export default function HeroSection() {
       />
 
       {/* Glassmorphism overlay para mejorar legibilidad */}
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-amber-900/20 via-transparent to-amber-900/30" />
+      {/* <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-amber-900/20 via-transparent to-amber-900/30" /> */}
 
       {/* Destellos mágicos estilo Ghibli */}
       <GhibliSparkles count={25} />
