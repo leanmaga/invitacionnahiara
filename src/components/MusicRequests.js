@@ -6,6 +6,7 @@ import {
   Headphones,
   Loader2,
   AlertCircle,
+  Sparkles,
 } from "lucide-react";
 
 const supabase = {
@@ -65,6 +66,7 @@ export default function MusicRequests() {
   const [showForm, setShowForm] = useState(false);
   const [dbSongs, setDbSongs] = useState([]);
   const [loadingSongs, setLoadingSongs] = useState(true);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   useEffect(() => {
     loadSongs();
@@ -124,6 +126,7 @@ export default function MusicRequests() {
       setTimeout(() => {
         setShowForm(false);
         setSubmitted(false);
+        setIsFlipped(false); // Resetear flip después del éxito
       }, 3000);
     } catch (error) {
       console.error("Error submitting song:", error);
@@ -141,36 +144,45 @@ export default function MusicRequests() {
     return `${count} canciones`;
   };
 
-  const scrollToFormSection = () => {
-    const element = document.getElementById("mobile-form-section");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+  const handleShowForm = () => {
+    console.log("🎵 Showing form...", { showForm, isFlipped }); // Debug mejorado
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    console.log("❌ Closing form...", { showForm, isFlipped }); // Debug mejorado
+    setShowForm(false);
+  };
+
+  const handleFlipBack = () => {
+    console.log("⬅️ Going back to front...", { showForm, isFlipped }); // Debug nuevo
+    setIsFlipped(false);
+    setShowForm(false); // También resetear el form al volver
   };
 
   return (
     <div className="relative">
-      {/* Estilos CSS inline */}
+      {/* Estilos CSS */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
           .message-scrollbar {
             scrollbar-width: thin;
-            scrollbar-color: #ff6b6b #f5f5f5;
+            scrollbar-color: #f59e0b #fef3c7;
           }
           .message-scrollbar::-webkit-scrollbar {
             width: 6px;
           }
           .message-scrollbar::-webkit-scrollbar-track {
-            background: #f5f5f5;
+            background: #fef3c7;
             border-radius: 10px;
           }
           .message-scrollbar::-webkit-scrollbar-thumb {
-            background: #ff6b6b;
+            background: #f59e0b;
             border-radius: 10px;
           }
           .message-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #f44336;
+            background: #d97706;
           }
           
           @keyframes fadeInUp {
@@ -187,258 +199,360 @@ export default function MusicRequests() {
           .fade-in-up {
             animation: fadeInUp 0.3s ease-out forwards;
           }
+
+          /* Efecto 3D Flip Card - Corregido */
+          .flip-card {
+            perspective: 1000px;
+            width: 100%;
+            height: 100vh;
+          }
+          
+          .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-style: preserve-3d;
+          }
+          
+          .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+          }
+          
+          .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+          }
+          
+          .flip-card-back {
+            transform: rotateY(180deg);
+          }
+
+          /* Control de pointer-events basado en estado */
+          .flip-card:not(.flipped) .flip-card-front {
+            pointer-events: auto;
+            z-index: 10;
+          }
+          
+          .flip-card:not(.flipped) .flip-card-back {
+            pointer-events: none;
+            z-index: 1;
+          }
+          
+          .flip-card.flipped .flip-card-front {
+            pointer-events: none;
+            z-index: 1;
+          }
+          
+          .flip-card.flipped .flip-card-back {
+            pointer-events: auto;
+            z-index: 10;
+          }
+
+          .flip-card.flipped .flip-card-back * {
+            pointer-events: auto;
+          }
+
+          .golden-button {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
+            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.3);
+            animation: pulseGolden 2s infinite;
+          }
+
+          @keyframes pulseGolden {
+            0%, 100% { 
+              box-shadow: 0 8px 32px rgba(251, 191, 36, 0.3);
+              transform: scale(1);
+            }
+            50% { 
+              box-shadow: 0 12px 40px rgba(251, 191, 36, 0.5);
+              transform: scale(1.05);
+            }
+          }
+
+          .rotate-sparkles {
+            animation: rotateSpark 4s linear infinite;
+          }
+
+          @keyframes rotateSpark {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
         `,
         }}
       />
 
       {/* LAYOUT MÓVIL */}
       <div className="lg:hidden">
-        {/* Primera sección: Hero con imagen de fondo (100vh) */}
-        <div
-          className="relative h-screen w-full flex items-center justify-center"
-          style={{
-            backgroundImage: `url('/assets/background.jpg')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
-        >
-          {/* Contenido del hero */}
-          <div className="relative z-10 text-center max-w-lg mx-auto px-6">
-            {/* Icono musical animado */}
-            <div className="relative inline-flex items-center justify-center mb-8">
-              <div className="absolute inset-0">
-                <div className="w-24 h-24 bg-gradient-to-br from-pink-400/50 to-purple-400/50 rounded-full blur-2xl animate-pulse"></div>
-              </div>
-              <Music className="w-12 h-12 text-white relative z-10" />
-            </div>
+        <div className={`flip-card ${isFlipped ? "flipped" : ""}`}>
+          <div className="flip-card-inner">
+            {/* FRONT: Imagen con botón */}
+            <div className="flip-card-front">
+              <div
+                className="relative h-screen w-full flex items-center justify-center"
+                style={{
+                  backgroundImage: `url('/assets/background.jpg')`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-900/20 via-amber-800/30 to-yellow-700/40"></div>
 
-            {/* Título principal */}
-            <h2
-              className="font-bold text-4xl sm:text-5xl text-white mb-6 leading-tight"
-              style={{
-                textShadow: "0 0 30px rgba(236, 72, 153, 0.8)",
-                background:
-                  "linear-gradient(135deg, #ec4899, #a855f7, #06b6d4)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Pide tu Canción
-              <br />
-              <span className="text-3xl sm:text-4xl">Favorita</span>
-            </h2>
+                <div className="relative z-10 text-center max-w-lg mx-auto px-6">
+                  <div className="relative inline-flex items-center justify-center mb-8">
+                    <div className="absolute inset-0">
+                      <div className="w-24 h-24 bg-gradient-to-br from-yellow-400/50 to-amber-500/50 rounded-full blur-2xl animate-pulse"></div>
+                    </div>
+                    <Music className="w-12 h-12 text-yellow-100 relative z-10" />
+                    <div className="absolute -top-2 -right-2 rotate-sparkles">
+                      <Sparkles className="w-6 h-6 text-yellow-300" />
+                    </div>
+                  </div>
 
-            {/* Descripción */}
-            <p className="text-lg text-white/90 mb-8 font-medium drop-shadow-lg">
-              Ayúdanos a crear la playlist perfecta
-              <br />
-              ¡Tu canción favorita puede ser la que haga bailar a todos!
-            </p>
+                  <h2
+                    className="font-bold text-4xl sm:text-5xl text-yellow-100 mb-6 leading-tight"
+                    style={{
+                      textShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
+                    }}
+                  >
+                    Pide tu Canción
+                    <br />
+                    <span className="text-3xl sm:text-4xl">Favorita</span>
+                  </h2>
 
-            {/* Botón CTA y flecha */}
-            <div className="flex flex-col items-center">
-              {/* Indicador visual de scroll */}
-              <div className="mt-6 animate-bounce">
-                <svg
-                  className="w-6 h-6 text-white/60"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                  />
-                </svg>
+                  <p className="text-lg text-yellow-100/90 mb-12 font-medium drop-shadow-lg">
+                    Ayúdanos a crear la playlist perfecta
+                    <br />
+                    ¡Tu canción favorita puede ser la que haga bailar a todos!
+                  </p>
+
+                  {/* Botón dorado para voltear la tarjeta */}
+                  <button
+                    onClick={() => setIsFlipped(true)}
+                    className="golden-button text-yellow-900 px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center gap-3 mx-auto"
+                  >
+                    <Music className="w-6 h-6" />
+                    Agregar Mi Canción
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Segunda sección: Formulario (100vh) */}
-        <div
-          id="mobile-form-section"
-          className="h-screen bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900 flex items-center justify-center"
-        >
-          <div className="w-full max-w-lg px-6">
-            {!showForm ? (
-              /* Vista inicial con botón y lista de canciones */
-              <div className="space-y-6">
-                {/* Botón principal para mostrar formulario */}
-                <div className="text-center">
-                  <div className="inline-flex items-center gap-3">
-                    <button
-                      onClick={() => setShowForm(true)}
-                      className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20  bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 font-bold text-lg text-white shadow-2xl overflow-hidden hover:scale-105 transition-transform"
-                    >
-                      <div className="relative z-10 flex items-center justify-center gap-3">
-                        <Music className="w-5 h-5" />
-                        Agregar Mi Canción
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Contador de canciones */}
-                <div className="text-center">
-                  <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
-                    <Headphones className="w-5 h-5 text-white" />
-                    <span className="text-white font-semibold">
-                      {getSongsCountText(dbSongs.length)} agregadas
-                    </span>
-                  </div>
-                </div>
-
-                {/* Lista de canciones recientes */}
-                {dbSongs.length > 0 && (
-                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4">
-                    <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
-                      <Music className="w-4 h-4" />
-                      Últimas Canciones
-                    </h3>
-                    <div className="space-y-2 max-h-60 overflow-y-auto message-scrollbar">
-                      {dbSongs.slice(0, 8).map((song, index) => (
-                        <div
-                          key={song.id}
-                          className="flex items-center gap-2 p-3 bg-white/5 rounded-lg transition-opacity duration-300 fade-in-up"
-                          style={{ animationDelay: `${index * 100}ms` }}
+            {/* BACK: Formulario y lista */}
+            <div className="flip-card-back">
+              <div className="h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-yellow-100 flex items-center justify-center overflow-y-auto">
+                <div className="w-full max-w-lg px-6 py-8">
+                  {!showForm ? (
+                    /* Vista inicial con botón y lista de canciones */
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-yellow-800 font-bold text-lg flex items-center gap-2">
+                          <Music className="w-5 h-5" />
+                          Playlist de la Fiesta
+                        </h3>
+                        {/* Botón para volver */}
+                        <button
+                          onClick={handleFlipBack}
+                          className="clickable text-yellow-600 hover:text-yellow-800 transition-colors"
                         >
-                          <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full flex-shrink-0"></div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-white font-medium truncate text-sm">
-                              {song.song_name}
-                            </p>
-                            {song.artist_name && (
-                              <p className="text-purple-200 text-xs truncate">
-                                {song.artist_name}
-                              </p>
-                            )}
-                            {song.message && (
-                              <p className="text-gray-300 text-xs truncate italic mt-1">
-                                {song.message}
-                              </p>
-                            )}
+                          <svg
+                            className="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+
+                      {/* Botón principal para mostrar formulario */}
+                      <div className="text-center">
+                        <button
+                          onClick={handleShowForm}
+                          className="clickable inline-flex items-center gap-3 bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 rounded-full px-6 py-3 font-bold text-lg text-yellow-900 shadow-2xl hover:scale-105 transition-transform"
+                        >
+                          <Music className="w-5 h-5" />
+                          Agregar Mi Canción
+                        </button>
+                      </div>
+
+                      {/* Contador de canciones */}
+                      <div className="text-center">
+                        <div className="inline-flex items-center gap-3 bg-white/40 backdrop-blur-sm rounded-full px-6 py-3 border border-yellow-300/40">
+                          <Headphones className="w-5 h-5 text-yellow-700" />
+                          <span className="text-yellow-800 font-semibold">
+                            {getSongsCountText(dbSongs.length)} agregadas
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Lista de canciones recientes */}
+                      {dbSongs.length > 0 && (
+                        <div className="bg-white/40 backdrop-blur-sm border border-yellow-300/40 rounded-2xl p-4">
+                          <h4 className="text-yellow-800 font-bold text-sm mb-3 flex items-center gap-2">
+                            <Music className="w-4 h-4" />
+                            Últimas Canciones
+                          </h4>
+                          <div className="space-y-2 max-h-60 overflow-y-auto message-scrollbar">
+                            {dbSongs.slice(0, 8).map((song, index) => (
+                              <div
+                                key={song.id}
+                                className="flex items-center gap-2 p-3 bg-white/30 rounded-lg transition-opacity duration-300 fade-in-up"
+                                style={{ animationDelay: `${index * 100}ms` }}
+                              >
+                                <div className="w-2 h-2 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-full flex-shrink-0"></div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-yellow-900 font-medium truncate text-sm">
+                                    {song.song_name}
+                                  </p>
+                                  {song.artist_name && (
+                                    <p className="text-yellow-700 text-xs truncate">
+                                      {song.artist_name}
+                                    </p>
+                                  )}
+                                  {song.message && (
+                                    <p className="text-yellow-600 text-xs truncate italic mt-1">
+                                      {song.message}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              /* Formulario de petición de canción */
-              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 relative shadow-2xl">
-                {/* Botón cerrar */}
-                <button
-                  onClick={() => setShowForm(false)}
-                  className="absolute top-4 right-4 w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all text-sm hover:rotate-90"
-                >
-                  ✕
-                </button>
-
-                {/* Título del formulario */}
-                <div className="mb-4">
-                  <h3 className="text-white font-bold text-lg flex items-center gap-2">
-                    <Music className="w-5 h-5" />
-                    Tu Canción Favorita
-                  </h3>
-                </div>
-
-                {!submitted ? (
-                  /* Campos del formulario */
-                  <div className="space-y-4">
-                    {/* Mensaje de error */}
-                    {error && (
-                      <div className="p-3 bg-red-500/20 border border-red-400/50 rounded-xl flex items-center gap-2 text-red-200">
-                        <AlertCircle className="w-4 h-4" />
-                        <span className="text-xs">{error}</span>
-                      </div>
-                    )}
-
-                    {/* Campo nombre de canción */}
-                    <div>
-                      <label className="block text-white font-medium mb-2 text-sm">
-                        Nombre de la Canción *
-                      </label>
-                      <input
-                        type="text"
-                        value={songRequest}
-                        onChange={(e) => setSongRequest(e.target.value)}
-                        className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all text-sm"
-                        placeholder="Ej: Soy Cordobés"
-                        disabled={loading}
-                        onKeyPress={(e) => e.key === "Enter" && handleSubmit()}
-                      />
-                    </div>
-
-                    {/* Campo artista */}
-                    <div>
-                      <label className="block text-white font-medium mb-2 text-sm">
-                        Artista
-                      </label>
-                      <input
-                        type="text"
-                        value={artistRequest}
-                        onChange={(e) => setArtistRequest(e.target.value)}
-                        className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all text-sm"
-                        placeholder="Ej: Rodrigo"
-                        disabled={loading}
-                        onKeyPress={(e) => e.key === "Enter" && handleSubmit()}
-                      />
-                    </div>
-
-                    {/* Campo mensaje */}
-                    <div>
-                      <label className="block text-white font-medium mb-2 text-sm">
-                        Mensaje Especial (Opcional)
-                      </label>
-                      <textarea
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        rows={2}
-                        className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all resize-none text-sm"
-                        placeholder="¿Por qué es especial esta canción?"
-                        disabled={loading}
-                      />
-                    </div>
-
-                    {/* Botón enviar */}
-                    <button
-                      onClick={handleSubmit}
-                      disabled={loading || !songRequest.trim()}
-                      className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-3 rounded-xl font-bold text-sm hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 hover:scale-105"
-                    >
-                      {loading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Send className="w-4 h-4" />
                       )}
-                      {loading ? "Enviando..." : "¡Agregar a la Playlist!"}
-                    </button>
-                  </div>
-                ) : (
-                  /* Mensaje de éxito */
-                  <div className="text-center py-4">
-                    <Heart className="w-12 h-12 text-pink-400 mx-auto mb-3 animate-pulse" />
-                    <h4 className="text-white font-bold text-lg mb-2">
-                      ¡Canción Agregada! 🎉
-                    </h4>
-                    <p className="text-purple-200 text-sm">
-                      Tu canción ya está en la lista. ¡Esperamos que suene
-                      durante la fiesta! 💫
-                    </p>
-                  </div>
-                )}
+                    </div>
+                  ) : (
+                    /* Formulario de petición de canción */
+                    <div className="bg-white/60 backdrop-blur-xl border border-yellow-300/40 rounded-3xl p-6 relative shadow-2xl">
+                      {/* Botón cerrar */}
+                      <button
+                        onClick={handleCloseForm}
+                        className="clickable absolute top-4 right-4 w-8 h-8 bg-white/40 hover:bg-white/60 rounded-full flex items-center justify-center text-yellow-800 transition-all text-sm hover:rotate-90"
+                      >
+                        ✕
+                      </button>
+
+                      {/* Título del formulario */}
+                      <div className="mb-4">
+                        <h3 className="text-yellow-800 font-bold text-lg flex items-center gap-2">
+                          <Music className="w-5 h-5" />
+                          Tu Canción Favorita
+                        </h3>
+                      </div>
+
+                      {!submitted ? (
+                        /* Campos del formulario */
+                        <div className="space-y-4">
+                          {/* Mensaje de error */}
+                          {error && (
+                            <div className="p-3 bg-red-500/20 border border-red-400/50 rounded-xl flex items-center gap-2 text-red-700">
+                              <AlertCircle className="w-4 h-4" />
+                              <span className="text-xs">{error}</span>
+                            </div>
+                          )}
+
+                          {/* Campo nombre de canción */}
+                          <div>
+                            <label className="block text-yellow-800 font-medium mb-2 text-sm">
+                              Nombre de la Canción *
+                            </label>
+                            <input
+                              type="text"
+                              value={songRequest}
+                              onChange={(e) => setSongRequest(e.target.value)}
+                              className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-xl text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all text-sm"
+                              placeholder="Ej: Soy Cordobés"
+                              disabled={loading}
+                              onKeyPress={(e) =>
+                                e.key === "Enter" && handleSubmit()
+                              }
+                            />
+                          </div>
+
+                          {/* Campo artista */}
+                          <div>
+                            <label className="block text-yellow-800 font-medium mb-2 text-sm">
+                              Artista
+                            </label>
+                            <input
+                              type="text"
+                              value={artistRequest}
+                              onChange={(e) => setArtistRequest(e.target.value)}
+                              className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-xl text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all text-sm"
+                              placeholder="Ej: Rodrigo"
+                              disabled={loading}
+                              onKeyPress={(e) =>
+                                e.key === "Enter" && handleSubmit()
+                              }
+                            />
+                          </div>
+
+                          {/* Campo mensaje */}
+                          <div>
+                            <label className="block text-yellow-800 font-medium mb-2 text-sm">
+                              Mensaje Especial (Opcional)
+                            </label>
+                            <textarea
+                              value={message}
+                              onChange={(e) => setMessage(e.target.value)}
+                              rows={2}
+                              className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-xl text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all resize-none text-sm"
+                              placeholder="¿Por qué es especial esta canción?"
+                              disabled={loading}
+                            />
+                          </div>
+
+                          {/* Botón enviar */}
+                          <button
+                            onClick={handleSubmit}
+                            disabled={loading || !songRequest.trim()}
+                            className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 text-yellow-900 px-4 py-3 rounded-xl font-bold text-sm hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 hover:scale-105"
+                          >
+                            {loading ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Send className="w-4 h-4" />
+                            )}
+                            {loading
+                              ? "Enviando..."
+                              : "¡Agregar a la Playlist!"}
+                          </button>
+                        </div>
+                      ) : (
+                        /* Mensaje de éxito */
+                        <div className="text-center py-4">
+                          <Heart className="w-12 h-12 text-yellow-600 mx-auto mb-3 animate-pulse" />
+                          <h4 className="text-yellow-800 font-bold text-lg mb-2">
+                            ¡Canción Agregada!
+                          </h4>
+                          <p className="text-yellow-700 text-sm">
+                            Tu canción ya está en la lista. ¡Esperamos que suene
+                            durante la fiesta!
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* LAYOUT DESKTOP - Mantiene el diseño original */}
+      {/* LAYOUT DESKTOP */}
       <div className="hidden lg:block relative min-h-screen overflow-hidden">
         {/* Imagen de fondo - Mitad izquierda */}
         <div className="absolute inset-0 lg:w-1/2 lg:left-0 lg:inset-y-0">
@@ -454,7 +568,7 @@ export default function MusicRequests() {
         </div>
 
         {/* Fondo degradado - Mitad derecha */}
-        <div className="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900"></div>
+        <div className="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-br from-yellow-50 via-amber-50 to-yellow-100"></div>
 
         {/* Contenido principal */}
         <div className="relative z-10 min-h-screen">
@@ -465,19 +579,18 @@ export default function MusicRequests() {
                 <div className="text-center lg:text-left lg:pl-12">
                   <div className="relative inline-flex items-center justify-center mb-8">
                     <div className="absolute inset-0">
-                      <div className="w-24 h-24 bg-gradient-to-br from-pink-400/50 to-purple-400/50 rounded-full blur-2xl animate-pulse"></div>
+                      <div className="w-24 h-24 bg-gradient-to-br from-yellow-400/50 to-amber-500/50 rounded-full blur-2xl animate-pulse"></div>
                     </div>
                     <Music className="w-12 h-12 text-white relative z-10" />
+                    <div className="absolute -top-2 -right-2 rotate-sparkles">
+                      <Sparkles className="w-6 h-6 text-yellow-300" />
+                    </div>
                   </div>
 
                   <h2
                     className="font-bold text-5xl md:text-6xl lg:text-7xl text-white mb-6 leading-tight"
                     style={{
-                      textShadow: "0 0 30px rgba(236, 72, 153, 0.8)",
-                      background:
-                        "linear-gradient(135deg, #ec4899, #a855f7, #06b6d4)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
+                      textShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
                     }}
                   >
                     Pide tu Canción
@@ -502,8 +615,8 @@ export default function MusicRequests() {
                     <div className="space-y-8">
                       <div className="text-center">
                         <button
-                          onClick={() => setShowForm(true)}
-                          className="inline-flex items-center gap-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full px-8 py-4 font-bold text-xl text-white shadow-2xl hover:scale-105 transition-transform border border-white/20"
+                          onClick={handleShowForm}
+                          className="inline-flex items-center gap-3 bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 rounded-full px-8 py-4 font-bold text-xl text-yellow-900 shadow-2xl hover:scale-105 transition-transform border border-yellow-300/40"
                         >
                           <Music className="w-6 h-6" />
                           <span>Agregar Mi Canción</span>
@@ -511,23 +624,23 @@ export default function MusicRequests() {
                       </div>
 
                       <div className="text-center">
-                        <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-8 py-4 border border-white/20">
-                          <Headphones className="w-6 h-6 text-white" />
-                          <span className="text-white font-semibold text-xl">
+                        <div className="inline-flex items-center gap-3 bg-white/40 backdrop-blur-sm rounded-full px-8 py-4 border border-yellow-300/40">
+                          <Headphones className="w-6 h-6 text-yellow-700" />
+                          <span className="text-yellow-800 font-semibold text-xl">
                             {getSongsCountText(dbSongs.length)} agregadas
                           </span>
                         </div>
                       </div>
 
-                      <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-                        <h3 className="text-white font-bold text-xl mb-4 flex items-center gap-2">
+                      <div className="bg-white/40 backdrop-blur-sm border border-yellow-300/40 rounded-2xl p-6">
+                        <h3 className="text-yellow-800 font-bold text-xl mb-4 flex items-center gap-2">
                           <Music className="w-6 h-6" />
                           Canciones Solicitadas
                         </h3>
 
                         {loadingSongs ? (
                           <div className="flex items-center justify-center py-8">
-                            <Loader2 className="w-8 h-8 animate-spin text-white" />
+                            <Loader2 className="w-8 h-8 animate-spin text-yellow-600" />
                           </div>
                         ) : dbSongs.length > 0 ? (
                           <div
@@ -537,30 +650,30 @@ export default function MusicRequests() {
                             {dbSongs.map((song, index) => (
                               <div
                                 key={song.id}
-                                className="p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all cursor-pointer group fade-in-up"
+                                className="p-3 bg-white/30 rounded-xl hover:bg-white/50 transition-all cursor-pointer group fade-in-up"
                                 style={{ animationDelay: `${index * 100}ms` }}
                               >
                                 <div className="flex items-start gap-3">
-                                  <Music className="w-4 h-4 text-purple-400 flex-shrink-0 mt-1 group-hover:text-purple-300 transition-colors" />
+                                  <Music className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-1 group-hover:text-yellow-700 transition-colors" />
                                   <div className="flex-1 min-w-0">
-                                    <p className="font-medium text-white truncate group-hover:text-purple-200 transition-colors">
+                                    <p className="font-medium text-yellow-900 truncate group-hover:text-yellow-800 transition-colors">
                                       {song.song_name}
                                     </p>
                                     {song.artist_name && (
-                                      <p className="text-sm text-purple-200 truncate">
+                                      <p className="text-sm text-yellow-700 truncate">
                                         {song.artist_name}
                                       </p>
                                     )}
                                     {song.message && (
                                       <div
-                                        className="text-xs text-gray-300 mt-1 italic message-scrollbar overflow-y-auto"
+                                        className="text-xs text-yellow-600 mt-1 italic message-scrollbar overflow-y-auto"
                                         style={{ maxHeight: "40px" }}
                                         title={song.message}
                                       >
                                         {song.message}
                                       </div>
                                     )}
-                                    <p className="text-xs text-gray-400 mt-1">
+                                    <p className="text-xs text-yellow-500 mt-1">
                                       {new Date(
                                         song.created_at
                                       ).toLocaleDateString("es-ES", {
@@ -577,8 +690,8 @@ export default function MusicRequests() {
                           </div>
                         ) : (
                           <div className="text-center py-12">
-                            <Music className="w-12 h-12 text-white/20 mx-auto mb-4" />
-                            <p className="text-white/60">
+                            <Music className="w-12 h-12 text-yellow-400/60 mx-auto mb-4" />
+                            <p className="text-yellow-600">
                               Aún no hay canciones solicitadas. ¡Sé el primero!
                             </p>
                           </div>
@@ -586,16 +699,16 @@ export default function MusicRequests() {
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 relative shadow-2xl">
+                    <div className="bg-white/60 backdrop-blur-xl border border-yellow-300/40 rounded-3xl p-8 relative shadow-2xl">
                       <button
-                        onClick={() => setShowForm(false)}
-                        className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all text-xl hover:rotate-90"
+                        onClick={handleCloseForm}
+                        className="absolute top-4 right-4 w-10 h-10 bg-white/40 hover:bg-white/60 rounded-full flex items-center justify-center text-yellow-800 transition-all text-xl hover:rotate-90"
                       >
                         ✕
                       </button>
 
                       <div className="mb-6">
-                        <h3 className="text-white font-bold text-2xl flex items-center gap-3">
+                        <h3 className="text-yellow-800 font-bold text-2xl flex items-center gap-3">
                           <Music className="w-8 h-8" />
                           Solicita una Canción
                         </h3>
@@ -604,21 +717,21 @@ export default function MusicRequests() {
                       {!submitted ? (
                         <div className="space-y-6">
                           {error && (
-                            <div className="p-4 bg-red-500/20 border border-red-400/50 rounded-xl flex items-center gap-2 text-red-200">
+                            <div className="p-4 bg-red-500/20 border border-red-400/50 rounded-xl flex items-center gap-2 text-red-700">
                               <AlertCircle className="w-5 h-5" />
                               <span>{error}</span>
                             </div>
                           )}
 
                           <div>
-                            <label className="block text-white font-medium mb-2">
+                            <label className="block text-yellow-800 font-medium mb-2">
                               Nombre de la Canción *
                             </label>
                             <input
                               type="text"
                               value={songRequest}
                               onChange={(e) => setSongRequest(e.target.value)}
-                              className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all"
+                              className="w-full px-4 py-3 bg-white/50 border border-yellow-300/50 rounded-xl text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
                               placeholder="Ej: Soy Cordobés"
                               disabled={loading}
                               onKeyPress={(e) =>
@@ -628,14 +741,14 @@ export default function MusicRequests() {
                           </div>
 
                           <div>
-                            <label className="block text-white font-medium mb-2">
+                            <label className="block text-yellow-800 font-medium mb-2">
                               Artista
                             </label>
                             <input
                               type="text"
                               value={artistRequest}
                               onChange={(e) => setArtistRequest(e.target.value)}
-                              className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all"
+                              className="w-full px-4 py-3 bg-white/50 border border-yellow-300/50 rounded-xl text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
                               placeholder="Ej: Rodrigo"
                               disabled={loading}
                               onKeyPress={(e) =>
@@ -645,14 +758,14 @@ export default function MusicRequests() {
                           </div>
 
                           <div>
-                            <label className="block text-white font-medium mb-2">
+                            <label className="block text-yellow-800 font-medium mb-2">
                               Mensaje Especial (Opcional)
                             </label>
                             <textarea
                               value={message}
                               onChange={(e) => setMessage(e.target.value)}
                               rows={3}
-                              className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all resize-none"
+                              className="w-full px-4 py-3 bg-white/50 border border-yellow-300/50 rounded-xl text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all resize-none"
                               placeholder="¿Por qué es especial esta canción para ti?"
                               disabled={loading}
                             />
@@ -661,7 +774,7 @@ export default function MusicRequests() {
                           <button
                             onClick={handleSubmit}
                             disabled={loading || !songRequest.trim()}
-                            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all flex items-center justify-center gap-3 disabled:opacity-50 hover:scale-105"
+                            className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 text-yellow-900 px-6 py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all flex items-center justify-center gap-3 disabled:opacity-50 hover:scale-105"
                           >
                             {loading ? (
                               <Loader2 className="w-6 h-6 animate-spin" />
@@ -673,13 +786,13 @@ export default function MusicRequests() {
                         </div>
                       ) : (
                         <div className="text-center py-8">
-                          <Heart className="w-16 h-16 text-pink-400 mx-auto mb-4 animate-pulse" />
-                          <h4 className="text-white font-bold text-2xl mb-3">
-                            ¡Canción Agregada Exitosamente! 🎉
+                          <Heart className="w-16 h-16 text-yellow-600 mx-auto mb-4 animate-pulse" />
+                          <h4 className="text-yellow-800 font-bold text-2xl mb-3">
+                            ¡Canción Agregada Exitosamente!
                           </h4>
-                          <p className="text-purple-200 mb-4">
+                          <p className="text-yellow-700 mb-4">
                             Tu canción aparece ahora en la lista. ¡Esperamos que
-                            suene durante la fiesta! 💫
+                            suene durante la fiesta!
                           </p>
                         </div>
                       )}
