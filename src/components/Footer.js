@@ -149,6 +149,24 @@ export default function Footer() {
     <footer className="relative bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white py-20 overflow-hidden">
       <style>{styles}</style>
 
+      {/* Imagen de fondo con efecto sombreado */}
+      <div
+        className="absolute inset-0 opacity-25"
+        style={{
+          backgroundImage: "url(/assets/budaNight.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center 20%",
+          backgroundRepeat: "no-repeat",
+          maskImage:
+            "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 80%)",
+          WebkitMaskImage:
+            "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 80%)",
+        }}
+      />
+
+      {/* Overlay adicional para mejorar la legibilidad */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none"></div>
+
       {/* Partículas doradas flotantes */}
       <div className="absolute inset-0 pointer-events-none">
         {particles.map((particle) => (
@@ -198,9 +216,9 @@ export default function Footer() {
         {/* Grid de Contenido */}
         <div className="grid md:grid-cols-3 gap-10 mb-16">
           {/* Sección de Contacto */}
-          <div className="slide-in-left glass-dark rounded-3xl p-8 shadow-2xl">
-            <div className="text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-6">
+          <div className="slide-in-left">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-3 mb-6">
                 <Phone className="w-6 h-6 text-yellow-400" />
                 <h3 className="font-serif text-2xl font-bold text-yellow-300">
                   Contacto
@@ -213,7 +231,7 @@ export default function Footer() {
                 </p>
 
                 {telefono && (
-                  <div className="flex items-center gap-3 justify-center md:justify-start">
+                  <div className="flex items-center gap-3 justify-center">
                     <Phone className="w-4 h-4 text-yellow-400" />
                     <span className="font-medium">{telefono}</span>
                   </div>
@@ -235,10 +253,7 @@ export default function Footer() {
           </div>
 
           {/* Detalles del Evento */}
-          <div
-            className="slide-in-up glass-dark rounded-3xl p-8 shadow-2xl"
-            style={{ animationDelay: "0.2s" }}
-          >
+          <div className="slide-in-up" style={{ animationDelay: "0.2s" }}>
             <div className="text-center">
               <div className="flex items-center justify-center gap-3 mb-6">
                 <Sparkles className="w-6 h-6 text-yellow-400" />
@@ -261,19 +276,16 @@ export default function Footer() {
           </div>
 
           {/* Redes Sociales */}
-          <div
-            className="slide-in-right glass-dark rounded-3xl p-8 shadow-2xl"
-            style={{ animationDelay: "0.4s" }}
-          >
-            <div className="text-center md:text-right">
-              <div className="flex items-center justify-center md:justify-end gap-3 mb-6">
+          <div className="slide-in-right" style={{ animationDelay: "0.4s" }}>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-3 mb-6">
                 <h3 className="font-serif text-2xl font-bold text-yellow-300">
                   Sígueme
                 </h3>
                 <Heart className="w-6 h-6 text-yellow-400" />
               </div>
 
-              <div className="flex gap-4 justify-center md:justify-end mb-4">
+              <div className="flex gap-4 justify-center mb-4">
                 {instagramUser && (
                   <a
                     href={`https://instagram.com/${instagramUser}`}
