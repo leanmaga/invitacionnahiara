@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import {
   Heart,
   Crown,
@@ -10,28 +9,48 @@ import {
   MessageCircle,
   Instagram,
   Facebook,
+  Star,
+  Gem,
 } from "lucide-react";
-import { useQuinceaneraConfig } from "@/hooks/useQuinceaneraConfig";
-import AnimatedButterflies from "./AnimatedButterflies";
 
 export default function Footer() {
   const [mounted, setMounted] = useState(false);
-  const {
-    nombre,
-    telefono,
-    whatsapp,
-    fechaEvento,
-    horaEvento,
-    lugar,
-    direccion,
-    instagramUser,
-    facebookPage,
-    nombreFamilia,
-  } = useQuinceaneraConfig();
+  const [particles, setParticles] = useState([]);
 
-  // Solo ejecutar en el cliente para evitar errores de hidratación
+  // Configuración desde variables de entorno
+  const nombre = process.env.NEXT_PUBLIC_NOMBRE_QUINCEANERA || "Nahiara";
+  const telefono = process.env.NEXT_PUBLIC_TELEFONO || "+54 11 2776-4823";
+  const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+541155299849";
+  const fechaEvento =
+    process.env.NEXT_PUBLIC_FECHA_EVENTO || "Sábado 08 de Noviembre, 2025";
+  const horaEvento =
+    process.env.NEXT_PUBLIC_HORA_EVENTO || "10:00 AM - 19:00 PM";
+  const lugar =
+    process.env.NEXT_PUBLIC_LUGAR_EVENTO || "Sociedad de fomento 'La Helvecia'";
+  const direccion =
+    process.env.NEXT_PUBLIC_DIRECCION_EVENTO ||
+    "Victoria 2051, B1716 Libertad, Merlo";
+  const instagramUser =
+    process.env.NEXT_PUBLIC_INSTAGRAM_USER || "nahiara_15años";
+  const facebookPage =
+    process.env.NEXT_PUBLIC_FACEBOOK_PAGE || "Nahiara Quinceañera";
+  const nombreFamilia =
+    process.env.NEXT_PUBLIC_NOMBRE_FAMILIA || "Familia Garbán";
+
+  // Solo ejecutar en el cliente
   useEffect(() => {
     setMounted(true);
+
+    // Generar partículas doradas para el footer
+    const newParticles = Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 6,
+      duration: 5 + Math.random() * 4,
+      size: Math.random() * 3 + 1,
+    }));
+    setParticles(newParticles);
   }, []);
 
   const whatsappLink = `https://wa.me/${whatsapp.replace(
@@ -39,159 +58,294 @@ export default function Footer() {
     ""
   )}?text=Hola! Te escribo por la invitación de los 15 de ${nombre}`;
 
+  const styles = `
+    @keyframes floatGently {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-15px) rotate(45deg); }
+      50% { transform: translateY(-25px) rotate(90deg); }
+      75% { transform: translateY(-15px) rotate(135deg); }
+    }
+
+    @keyframes shimmerGold {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+        transform: scale(1);
+      }
+      50% { 
+        box-shadow: 0 0 40px rgba(251, 191, 36, 0.5);
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .particle-gentle {
+      animation: floatGently var(--duration) ease-in-out infinite;
+      animation-delay: var(--delay);
+    }
+
+    .shimmer-text {
+      background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 50%, #fbbf24 100%);
+      background-size: 200% 100%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmerGold 3s ease-in-out infinite;
+    }
+
+    .glass-dark {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .slide-in-up {
+      animation: slideInUp 0.8s ease-out forwards;
+    }
+
+    .slide-in-left {
+      animation: slideInLeft 0.6s ease-out forwards;
+    }
+
+    .slide-in-right {
+      animation: slideInRight 0.6s ease-out forwards;
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    .hover-lift {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-5px) scale(1.05);
+    }
+  `;
+
+  if (!mounted) return null;
+
   return (
-    <footer className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-16 relative overflow-hidden">
-      <AnimatedButterflies
-        count={20}
-        animationDuration={4}
-        delayBetweenButterflies={0.3}
-      />
-      <div className="max-w-6xl mx-auto px-4 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <Crown className="w-12 h-12 mx-auto text-gold-400 mb-4" />
-          <h2 className="font-coockie text-4xl md:text-5xl font-bold text-white mb-4">
+    <footer className="relative bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white py-20 overflow-hidden">
+      <style>{styles}</style>
+
+      {/* Partículas doradas flotantes */}
+      <div className="absolute inset-0 pointer-events-none">
+        {particles.map((particle) => (
+          <div
+            key={particle.id}
+            className="absolute particle-gentle"
+            style={{
+              left: `${particle.x}%`,
+              top: `${particle.y}%`,
+              "--delay": `${particle.delay}s`,
+              "--duration": `${particle.duration}s`,
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+            }}
+          >
+            <Star className="w-full h-full text-yellow-400/30" />
+          </div>
+        ))}
+      </div>
+
+      {/* Overlay de gradiente sutil */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        {/* Header del Footer */}
+        <div className="text-center mb-16 slide-in-up">
+          <div className="relative inline-block mb-6">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-amber-400/20 blur-3xl pulse-glow"></div>
+            <Crown className="relative w-16 h-16 mx-auto text-yellow-400" />
+          </div>
+
+          <h2 className="font-serif text-4xl md:text-6xl font-bold mb-4 shimmer-text">
             {nombre}
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+
+          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto font-medium">
             Gracias por ser parte de este momento tan especial en mi vida.
           </p>
-        </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center md:text-left"
-          >
-            <h3 className="font-serif text-xl font-bold mb-4 text-quince-300">
-              Contacto
-            </h3>
-            <div className="space-y-3 text-gray-300">
-              <p className="font-medium">{nombreFamilia}</p>
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <Heart className="w-5 h-5 text-yellow-400 animate-pulse" />
+            <Gem className="w-6 h-6 text-yellow-500" />
+            <Heart className="w-5 h-5 text-yellow-400 animate-pulse" />
+          </div>
+        </div>
 
-              {telefono && (
-                <div className="flex items-center gap-2 justify-center md:justify-start">
-                  <Phone className="w-4 h-4 text-quince-400" />
-                  <span>{telefono}</span>
-                </div>
-              )}
+        {/* Grid de Contenido */}
+        <div className="grid md:grid-cols-3 gap-10 mb-16">
+          {/* Sección de Contacto */}
+          <div className="slide-in-left glass-dark rounded-3xl p-8 shadow-2xl">
+            <div className="text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-3 mb-6">
+                <Phone className="w-6 h-6 text-yellow-400" />
+                <h3 className="font-serif text-2xl font-bold text-yellow-300">
+                  Contacto
+                </h3>
+              </div>
 
-              {whatsapp && (
-                <motion.a
-                  href={whatsappLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg transition-colors"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>WhatsApp</span>
-                </motion.a>
-              )}
+              <div className="space-y-4 text-gray-300">
+                <p className="font-semibold text-lg text-yellow-200">
+                  {nombreFamilia}
+                </p>
+
+                {telefono && (
+                  <div className="flex items-center gap-3 justify-center md:justify-start">
+                    <Phone className="w-4 h-4 text-yellow-400" />
+                    <span className="font-medium">{telefono}</span>
+                  </div>
+                )}
+
+                {whatsapp && (
+                  <a
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 px-6 py-3 rounded-2xl transition-all duration-300 font-semibold hover-lift shadow-lg"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    <span>WhatsApp</span>
+                  </a>
+                )}
+              </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Event Details */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            viewport={{ once: true }}
-            className="text-center"
+          {/* Detalles del Evento */}
+          <div
+            className="slide-in-up glass-dark rounded-3xl p-8 shadow-2xl"
+            style={{ animationDelay: "0.2s" }}
           >
-            <h3 className="font-serif text-xl font-bold mb-4 text-quince-300">
-              Detalles del Evento
-            </h3>
-            <div className="space-y-2 text-gray-300">
-              <p className="font-medium">{fechaEvento}</p>
-              <p>{horaEvento}</p>
-              <p className="font-medium">{lugar}</p>
-              <p className="text-sm">{direccion}</p>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <Sparkles className="w-6 h-6 text-yellow-400" />
+                <h3 className="font-serif text-2xl font-bold text-yellow-300">
+                  Detalles del Evento
+                </h3>
+              </div>
+
+              <div className="space-y-3 text-gray-300">
+                <p className="font-bold text-lg text-yellow-200">
+                  {fechaEvento}
+                </p>
+                <p className="font-semibold">{horaEvento}</p>
+                <p className="font-bold text-yellow-200">{lugar}</p>
+                <p className="text-sm text-gray-400">{direccion}</p>
+              </div>
+
+              <div className="mt-6 h-1 w-20 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full mx-auto"></div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Social Media */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-center md:text-right"
+          {/* Redes Sociales */}
+          <div
+            className="slide-in-right glass-dark rounded-3xl p-8 shadow-2xl"
+            style={{ animationDelay: "0.4s" }}
           >
-            <h3 className="font-serif text-xl font-bold mb-4 text-quince-300">
-              Sígueme
-            </h3>
-            <div className="flex gap-4 justify-center md:justify-end">
+            <div className="text-center md:text-right">
+              <div className="flex items-center justify-center md:justify-end gap-3 mb-6">
+                <h3 className="font-serif text-2xl font-bold text-yellow-300">
+                  Sígueme
+                </h3>
+                <Heart className="w-6 h-6 text-yellow-400" />
+              </div>
+
+              <div className="flex gap-4 justify-center md:justify-end mb-4">
+                {instagramUser && (
+                  <a
+                    href={`https://instagram.com/${instagramUser}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center hover:shadow-xl transition-all duration-300 hover-lift"
+                  >
+                    <Instagram className="w-6 h-6" />
+                  </a>
+                )}
+
+                {facebookPage && (
+                  <a
+                    href={`https://facebook.com/${facebookPage}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl flex items-center justify-center hover:shadow-xl transition-all duration-300 hover-lift"
+                  >
+                    <Facebook className="w-6 h-6" />
+                  </a>
+                )}
+              </div>
+
               {instagramUser && (
-                <motion.a
-                  href={`https://instagram.com/${instagramUser}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center hover:shadow-lg transition-shadow"
-                >
-                  <Instagram className="w-5 h-5" />
-                </motion.a>
-              )}
-
-              {facebookPage && (
-                <motion.a
-                  href={`https://facebook.com/${facebookPage}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.1, rotate: -5 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:shadow-lg transition-shadow"
-                >
-                  <Facebook className="w-5 h-5" />
-                </motion.a>
+                <p className="text-sm text-yellow-400 font-medium">
+                  @{instagramUser}
+                </p>
               )}
             </div>
-
-            {instagramUser && (
-              <p className="text-sm text-gray-400 mt-2">@{instagramUser}</p>
-            )}
-          </motion.div>
+          </div>
         </div>
 
-        {/* Decorative separator */}
-        <div className="flex items-center justify-center mb-8">
-          <div className="h-px bg-gradient-to-r from-transparent via-quince-400 to-transparent w-32"></div>
-          <Sparkles className="mx-4 text-gold-400 w-6 h-6" />
-          <div className="h-px bg-gradient-to-r from-transparent via-quince-400 to-transparent w-32"></div>
+        {/* Separador Decorativo */}
+        <div className="flex items-center justify-center mb-10">
+          <div className="h-px bg-gradient-to-r from-transparent via-yellow-400 to-transparent w-32"></div>
+          <div className="mx-6 relative">
+            <div className="absolute inset-0 bg-yellow-400/20 blur-xl"></div>
+            <Sparkles className="relative text-yellow-400 w-8 h-8 animate-pulse" />
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-yellow-400 to-transparent w-32"></div>
         </div>
 
-        {/* Bottom section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="text-center"
+        {/* Sección Final */}
+        <div
+          className="text-center slide-in-up"
+          style={{ animationDelay: "0.6s" }}
         >
-          <p className="text-gray-400 mb-4">
-            Una princesa no necesita ser salvada. Ella puede salvarse a sí
-            misma.
-          </p>
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+          <div className="glass-dark rounded-2xl p-8 max-w-4xl mx-auto mb-8">
+            <p className="text-lg md:text-xl text-gray-300 font-medium italic mb-4">
+              "Una princesa no necesita ser salvada. Ella puede salvarse a sí
+              misma."
+            </p>
+
+            <div className="flex items-center justify-center gap-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className="w-4 h-4 text-yellow-400 animate-pulse"
+                  style={{ animationDelay: `${i * 0.2}s` }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center gap-3 text-gray-500 text-sm">
             <span>Hecho con</span>
-            <Heart className="w-4 h-4 text-quince-400" />
+            <Heart className="w-4 h-4 text-yellow-400 animate-pulse" />
             <span>
               para {nombre} • {new Date().getFullYear()}
             </span>
           </div>
-        </motion.div>
+        </div>
       </div>
     </footer>
   );
