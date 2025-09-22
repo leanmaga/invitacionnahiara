@@ -10,6 +10,7 @@ import {
   Flower2,
   Wind,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function DressCodeSection() {
   const [activeCategory, setActiveCategory] = useState("formal");
@@ -293,7 +294,9 @@ export default function DressCodeSection() {
                 {/* Card Caballeros */}
                 <div className="glass-morphism rounded-2xl overflow-hidden shadow-2xl card-hover h-full slide-left">
                   <div className="relative h-80 overflow-hidden">
-                    <img
+                    <Image
+                      width={300}
+                      height={400}
                       src={formalStyles.caballeros[0].image}
                       alt={formalStyles.caballeros[0].title}
                       className="w-full h-full object-cover"
@@ -326,7 +329,9 @@ export default function DressCodeSection() {
                 {/* Card Damas */}
                 <div className="glass-morphism rounded-2xl overflow-hidden shadow-2xl card-hover h-full slide-right">
                   <div className="relative h-80 overflow-hidden">
-                    <img
+                    <Image
+                      width={300}
+                      height={400}
                       src={formalStyles.damas[0].image}
                       alt={formalStyles.damas[0].title}
                       className="w-full h-full object-cover"

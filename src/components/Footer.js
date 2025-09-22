@@ -323,8 +323,8 @@ export default function Footer() {
         >
           <div className="glass-dark rounded-2xl p-8 max-w-4xl mx-auto mb-8">
             <p className="text-lg md:text-xl text-gray-300 font-medium italic mb-4">
-              "Una princesa no necesita ser salvada. Ella puede salvarse a sí
-              misma."
+              &ldquo;Una princesa no necesita ser salvada. Ella puede salvarse a
+              sí misma.&rdquo;
             </p>
 
             <div className="flex items-center justify-center gap-3">
