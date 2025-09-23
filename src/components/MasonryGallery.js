@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { X, ZoomIn } from "lucide-react";
-import { useImageLoader } from "@/components/PageLoader"; // ⭐ NUEVO: Importar el hook
 import Image from "next/image";
+import { useLoading } from "@/components/PageLoader";
 
 const MasonryGallery = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -10,40 +10,45 @@ const MasonryGallery = () => {
   const [imageHeights, setImageHeights] = useState({});
   const [isMobile, setIsMobile] = useState(false);
 
-  // ⭐ NUEVO: Crear array de URLs para el sistema de carga
-  const imageUrls = Array.from(
-    { length: 51 },
-    (_, i) => `/assets/${i + 1}.jpg`
-  );
+  const { updateImageCount, incrementLoadedImages } = useLoading();
+  const loadedCount = useRef(0);
 
-  // ⭐ NUEVO: Usar el hook para rastrear la carga de imágenes
-  const imagesLoaded = useImageLoader(imageUrls);
-
-  // Check if mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Generate random heights for masonry effect
   useEffect(() => {
     const heights = {};
     for (let i = 1; i <= 51; i++) {
-      heights[i] = Math.floor(Math.random() * 3) + 1; // Random height from 1-3
+      heights[i] = Math.floor(Math.random() * 3) + 1;
     }
     setImageHeights(heights);
   }, []);
+
+  useEffect(() => {
+    updateImageCount(51);
+  }, [updateImageCount]);
 
   const images = Array.from({ length: 51 }, (_, i) => ({
     id: i + 1,
     src: `/assets/${i + 1}.jpg`,
     alt: `Image ${i + 1}`,
   }));
+
+  const handleImageLoad = () => {
+    loadedCount.current += 1;
+    incrementLoadedImages();
+  };
+
+  const handleImageError = () => {
+    loadedCount.current += 1;
+    incrementLoadedImages();
+  };
 
   const openModal = (image) => {
     setSelectedImage(image);
@@ -57,7 +62,6 @@ const MasonryGallery = () => {
 
   const handleImageClick = (image) => {
     if (isMobile) {
-      // En mobile, solo ilumina la imagen
       const newIlluminated = new Set(illuminatedImages);
       if (newIlluminated.has(image.id)) {
         newIlluminated.delete(image.id);
@@ -66,7 +70,6 @@ const MasonryGallery = () => {
       }
       setIlluminatedImages(newIlluminated);
     } else {
-      // En desktop, abre el modal directamente
       openModal(image);
     }
   };
@@ -93,7 +96,6 @@ const MasonryGallery = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-amber-50 to-yellow-50 overflow-hidden">
-      {/* Masonry Grid */}
       <div
         className="masonry-grid p-1 md:p-2"
         style={{
@@ -115,8 +117,8 @@ const MasonryGallery = () => {
             <Image
               src={image.src}
               alt={image.alt}
-              width={auto}
-              height={auto}
+              fill
+              sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
               className="w-full h-full object-cover transition-all duration-500 ease-out"
               style={{
                 filter: isImageIlluminated(image.id)
@@ -126,14 +128,13 @@ const MasonryGallery = () => {
                   ? "scale(1.02)"
                   : "scale(1)",
               }}
-              // ⭐ OPCIONAL: Mejorar carga con priority para las primeras imágenes
-              priority={image.id <= 6}
-              loading={image.id <= 6 ? "eager" : "lazy"}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              priority={true}
+              loading="eager"
             />
 
-            {/* Zoom Icon Container */}
             <div className="absolute inset-0">
-              {/* Zoom Icon - Bottom right corner */}
               {(isImageIlluminated(image.id) ||
                 (!isMobile && hoveredImage === image.id)) && (
                 <div
@@ -153,13 +154,11 @@ const MasonryGallery = () => {
         ))}
       </div>
 
-      {/* Modal */}
       {selectedImage && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-sm"
           onClick={closeModal}
         >
-          {/* Polaroid Container */}
           <div
             className="relative animate-in zoom-in-95 duration-500 ease-out"
             style={{
@@ -168,7 +167,6 @@ const MasonryGallery = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Adhesive Tape */}
             <div
               className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-20 h-12 bg-yellow-100 opacity-70 rounded-sm shadow-lg z-10"
               style={{
@@ -180,25 +178,18 @@ const MasonryGallery = () => {
               }}
             />
 
-            {/* Polaroid Frame */}
             <div className="bg-white p-4 pb-16 shadow-2xl max-w-sm mx-4">
               <img
                 src={selectedImage.src}
                 alt={selectedImage.alt}
                 className="w-full h-auto object-cover"
-                style={{
-                  maxHeight: "400px",
-                  aspectRatio: "auto",
-                }}
+                style={{ maxHeight: "400px", aspectRatio: "auto" }}
               />
-
-              {/* Polaroid Caption Area */}
               <div className="text-center mt-4 text-gray-600 font-handwriting">
                 Imagen {selectedImage.id}
               </div>
             </div>
 
-            {/* Close Button - Top Left */}
             <button
               onClick={closeModal}
               className="absolute -top-8 -left-8 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-all duration-200 shadow-lg hover:scale-110"
@@ -209,18 +200,7 @@ const MasonryGallery = () => {
         </div>
       )}
 
-      {/* Custom Styles */}
       <style jsx>{`
-        @keyframes pulse {
-          0%,
-          100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.8;
-          }
-        }
-
         @keyframes polaroidFloat {
           0%,
           100% {
@@ -230,36 +210,30 @@ const MasonryGallery = () => {
             transform: rotate(-0.5deg) translateY(-5px);
           }
         }
-
         .font-handwriting {
           font-family: "Kalam", "Comic Sans MS", cursive;
           font-weight: 400;
         }
-
         @media (max-width: 480px) {
           .masonry-grid {
             grid-template-columns: repeat(2, 1fr) !important;
           }
         }
-
         @media (min-width: 481px) and (max-width: 768px) {
           .masonry-grid {
             grid-template-columns: repeat(3, 1fr) !important;
           }
         }
-
         @media (min-width: 769px) and (max-width: 1024px) {
           .masonry-grid {
             grid-template-columns: repeat(4, 1fr) !important;
           }
         }
-
         @media (min-width: 1025px) {
           .masonry-grid {
             grid-template-columns: repeat(6, 1fr) !important;
           }
         }
-
         @media (min-width: 1400px) {
           .masonry-grid {
             grid-template-columns: repeat(8, 1fr) !important;

@@ -11,12 +11,9 @@ import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import { AudioProvider } from "@/components/AudioContext";
 import MasonryGallery from "@/components/MasonryGallery";
-
-// ⭐ NUEVOS IMPORTS
 import { LoadingProvider, useLoading } from "@/components/PageLoader";
 import PageLoader from "@/components/PageLoader";
 
-// ⭐ NUEVO: Componente del contenido principal
 const MainContent = () => {
   const { isLoading } = useLoading();
 
@@ -26,21 +23,23 @@ const MainContent = () => {
         {isLoading && <PageLoader />}
       </AnimatePresence>
 
-      {!isLoading && (
+      <div
+        className={`w-full min-h-screen bg-gradient-to-br from-quince-50 via-white to-gold-50 ${
+          isLoading ? "opacity-0 pointer-events-none absolute" : "opacity-100"
+        }`}
+      >
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: isLoading ? 0 : 1 }}
           transition={{ duration: 0.8 }}
-          className="w-full min-h-screen bg-gradient-to-br from-quince-50 via-white to-gold-50"
         >
           <Navigation />
 
-          {/* Contenedor principal con control de ancho */}
           <main className="w-full overflow-x-hidden">
             <HeroSection />
             <CountdownSection />
             <EventDetails />
-            <MasonryGallery /> {/* Tu galería ya modificada */}
+            <MasonryGallery />
             <DressCode />
             <LocationSection />
             <MusicRequests />
@@ -48,7 +47,7 @@ const MainContent = () => {
             <Footer />
           </main>
         </motion.div>
-      )}
+      </div>
     </>
   );
 };
