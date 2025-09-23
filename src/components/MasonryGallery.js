@@ -81,7 +81,7 @@ const MasonryGallery = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-amber-50 to-yellow-50 overflow-hidden">
       {/* Masonry Grid */}
       <div
         className="masonry-grid p-1 md:p-2"

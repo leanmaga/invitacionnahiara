@@ -32,28 +32,14 @@ export default function DressCodeSection() {
   const formalStyles = {
     caballeros: [
       {
-        title: "Elegancia Clásica",
+        title: "Elegante",
         image: "/assets/manTraje.jpg",
-        description: "Traje oscuro con corbata elegante",
-        items: [
-          "Traje negro o azul marino",
-          "Camisa blanca impecable",
-          "Corbata o moño",
-          "Zapatos de vestir lustrados",
-        ],
       },
     ],
     damas: [
       {
-        title: "Elegancia Atemporal",
+        title: "Elegante",
         image: "/assets/vestidoMujer.jpg",
-        description: "Vestido largo y sofisticado",
-        items: [
-          "Vestido largo en tonos oscuros",
-          "Zapatos cómodos para bailar",
-          "Accesorios discretos",
-          "Peinado elegante",
-        ],
       },
     ],
   };
@@ -67,7 +53,7 @@ export default function DressCodeSection() {
     },
     pileta: {
       title: "Diversión Acuática",
-      subtitle: "Para disfrutar la pileta",
+      subtitle: "Ropa informal para andar por el parque",
       icon: Waves,
       color: "from-blue-400 to-cyan-500",
       items: {
@@ -284,7 +270,7 @@ export default function DressCodeSection() {
                   evitar los tonos
                   <span className="font-bold text-yellow-800">
                     {" "}
-                    dorados y arena
+                    Beige y Arena
                   </span>
                 </p>
               </div>
@@ -301,28 +287,6 @@ export default function DressCodeSection() {
                       alt={formalStyles.caballeros[0].title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <h5 className="text-xl font-bold mb-1">
-                        {formalStyles.caballeros[0].title}
-                      </h5>
-                      <p className="text-sm opacity-90">
-                        {formalStyles.caballeros[0].description}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="space-y-3">
-                      {formalStyles.caballeros[0].items.map((item, idx) => (
-                        <div key={idx} className="flex items-center gap-3">
-                          <div className="w-2 h-2 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex-shrink-0"></div>
-                          <span className="text-yellow-800 text-sm font-medium">
-                            {item}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 </div>
 
@@ -336,28 +300,6 @@ export default function DressCodeSection() {
                       alt={formalStyles.damas[0].title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <h5 className="text-xl font-bold mb-1">
-                        {formalStyles.damas[0].title}
-                      </h5>
-                      <p className="text-sm opacity-90">
-                        {formalStyles.damas[0].description}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="space-y-3">
-                      {formalStyles.damas[0].items.map((item, idx) => (
-                        <div key={idx} className="flex items-center gap-3">
-                          <div className="w-2 h-2 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex-shrink-0"></div>
-                          <span className="text-yellow-800 text-sm font-medium">
-                            {item}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 </div>
               </div>

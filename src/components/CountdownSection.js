@@ -387,15 +387,6 @@ export default function CountdownSection() {
 
           {/* Información del evento con estilo */}
           <div className="space-y-4">
-            <div className="inline-block glass-golden rounded-2xl px-8 py-4 shadow-xl">
-              <div className="text-2xl md:text-3xl font-bold text-yellow-800 mb-2 shimmer-text">
-                {fechaEvento}
-              </div>
-              <div className="text-lg md:text-xl text-yellow-700 font-semibold">
-                {horaEvento}
-              </div>
-            </div>
-
             {/* Sparkles finales */}
             <div className="flex justify-center gap-3 mt-8">
               {Array.from({ length: 7 }).map((_, i) => (

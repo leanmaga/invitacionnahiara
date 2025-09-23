@@ -17,17 +17,13 @@ export default function EventDetails() {
   const [hoveredCard, setHoveredCard] = useState(null);
 
   // Configuración - reemplaza con tu hook useQuinceaneraConfig()
-  const fechaEvento =
-    process.env.NEXT_PUBLIC_FECHA_EVENTO || "Sábado 08 de Noviembre, 2025";
-  const horaEvento =
-    process.env.NEXT_PUBLIC_HORA_EVENTO || "10:00 AM - 19:00 PM";
-  const lugar =
-    process.env.NEXT_PUBLIC_LUGAR_EVENTO || "Sociedad de fomento 'La Helvecia'";
+  const fechaEvento = process.env.NEXT_PUBLIC_FECHA_EVENTO;
+  const horaEvento = process.env.NEXT_PUBLIC_HORA_EVENTO;
+  const lugar = process.env.NEXT_PUBLIC_LUGAR_EVENTO;
   const direccion =
     process.env.NEXT_PUBLIC_DIRECCION_EVENTO ||
     "Victoria 2051, B1716 Libertad, Merlo";
   const alias = process.env.NEXT_PUBLIC_ALIAS_BANCARIO || "nahiara.933.mp";
-  const nombre = process.env.NEXT_PUBLIC_NOMBRE_QUINCEANERA || "Nahiara";
 
   // Generar partículas flotantes
   useEffect(() => {
@@ -47,7 +43,6 @@ export default function EventDetails() {
       icon: Calendar,
       title: "Fecha",
       value: fechaEvento,
-      description: "Una fecha para recordar",
       color: "from-yellow-400 to-amber-500",
       bgColor: "from-yellow-100/50 to-amber-100/30",
     },
@@ -55,7 +50,6 @@ export default function EventDetails() {
       icon: Clock,
       title: "Hora",
       value: horaEvento,
-      description: "Tiempo de celebrar",
       color: "from-amber-400 to-yellow-500",
       bgColor: "from-amber-100/50 to-yellow-100/30",
     },
@@ -309,8 +303,7 @@ export default function EventDetails() {
             {/* Mensaje principal */}
             <div className="space-y-6 mb-8">
               <p className="text-xl md:text-2xl text-yellow-800 font-medium leading-relaxed">
-                Tu presencia es muy importante para mí, pero si querés dejarme
-                un detalle te dejo mi alias:
+                Podes dejar tu obsequio de manera monetaria al:
               </p>
 
               {/* Alias destacado */}
@@ -319,6 +312,10 @@ export default function EventDetails() {
                   {alias}
                 </div>
               </div>
+
+              <p className="text-xl md:text-2xl text-yellow-800 font-medium leading-relaxed">
+                Otros regalos que me gustan: Perfumes, Maquillaje, Ropa talle 1(38), Accesorios bijuterí, Adornos de cerámica, Agendas y Librería. 
+              </p>
             </div>
 
             {/* Decoración final */}

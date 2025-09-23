@@ -333,29 +333,10 @@ export default function Footer() {
           className="text-center slide-in-up"
           style={{ animationDelay: "0.6s" }}
         >
-          <div className="glass-dark rounded-2xl p-8 max-w-4xl mx-auto mb-8">
-            <p className="text-lg md:text-xl text-gray-300 font-medium italic mb-4">
-              &ldquo;Una princesa no necesita ser salvada. Ella puede salvarse a
-              sí misma.&rdquo;
-            </p>
-
-            <div className="flex items-center justify-center gap-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  className="w-4 h-4 text-yellow-400 animate-pulse"
-                  style={{ animationDelay: `${i * 0.2}s` }}
-                />
-              ))}
-            </div>
-          </div>
-
           <div className="flex items-center justify-center gap-3 text-gray-500 text-sm">
             <span>Hecho con</span>
             <Heart className="w-4 h-4 text-yellow-400 animate-pulse" />
-            <span>
-              para {nombre} • {new Date().getFullYear()}
-            </span>
+            <span>para {nombre}</span>
           </div>
         </div>
       </div>
