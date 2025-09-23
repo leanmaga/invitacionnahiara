@@ -36,12 +36,12 @@ const MusicPlayer = ({ className = "", showVolumeControl = true }) => {
         whileTap={{ scale: 0.95 }}
         onClick={togglePlayPause}
         disabled={isLoading}
-        className={`flex items-center gap-1 px-3 py-1.5 text-white text-xs font-medium rounded-full transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed relative overflow-hidden ${
+        className={`flex items-center gap-1 px-3 py-1.5 text-yellow-900 text-xs font-medium rounded-full transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed relative overflow-hidden ${
           isPlaying
-            ? "bg-gradient-to-r from-purple-500 via-purple-600 to-purple-500 bg-[length:200%_100%] animate-pulse shadow-lg shadow-purple-300/50"
+            ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 bg-[length:200%_100%] animate-pulse shadow-lg shadow-yellow-300/50"
             : isLoading
-            ? "bg-purple-400"
-            : "bg-purple-500 hover:bg-purple-600 hover:shadow-lg hover:shadow-purple-300/30"
+            ? "bg-yellow-400"
+            : "bg-yellow-500 hover:bg-yellow-600 hover:shadow-lg hover:shadow-yellow-300/30"
         }`}
         aria-label={isPlaying ? "Pausar música" : "Reproducir música"}
       >
@@ -98,7 +98,7 @@ const MusicPlayer = ({ className = "", showVolumeControl = true }) => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={toggleMute}
-            className="text-purple-600 hover:text-purple-700 p-1 rounded-full transition-all duration-300"
+            className="text-yellow-600 hover:text-yellow-700 p-1 rounded-full transition-all duration-300"
             aria-label={isMuted ? "Activar sonido" : "Silenciar"}
           >
             <motion.div
@@ -126,8 +126,8 @@ const MusicPlayer = ({ className = "", showVolumeControl = true }) => {
             className="w-16 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
             style={{
               background: `linear-gradient(to right, 
-                #8b5cf6 0%, 
-                #8b5cf6 ${(isMuted ? 0 : volume) * 100}%, 
+                #f59e0b 0%, 
+                #f59e0b ${(isMuted ? 0 : volume) * 100}%, 
                 #e5e7eb ${(isMuted ? 0 : volume) * 100}%, 
                 #e5e7eb 100%)`,
             }}
