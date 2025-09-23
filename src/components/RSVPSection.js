@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import {
   Send,
@@ -11,12 +13,14 @@ import {
   Sparkles,
   Calendar,
 } from "lucide-react";
+import { useQuinceaneraConfig } from "@/hooks/useQuinceaneraConfig";
+import { supabase } from "@/lib/supabase";
 
 export default function RSVPSection() {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    dietary: "",
+    dietary_restrictions: "",
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
@@ -26,15 +30,65 @@ export default function RSVPSection() {
   const [checkingExisting, setCheckingExisting] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
 
-  // Configuración
-  const nombre = "Sofia";
-  const whatsapp = "5493511234567";
-  const telefono = "(351) 123-4567";
-  const fechaLimiteRSVP = "15 de marzo, 2025";
+  // Obtener datos usando el hook centralizado
+  const { nombre, whatsapp, telefono, fechaLimiteRSVP } =
+    useQuinceaneraConfig();
 
+  // Validación de variables de entorno
+  if (!whatsapp) {
+    console.error(
+      "❌ NEXT_PUBLIC_WHATSAPP_NUMBER no está configurado en .env.local"
+    );
+  }
+
+  // Función para verificar si ya existe una confirmación (simulada - reemplazar con Supabase real)
   const checkExistingRSVP = async (name, phone) => {
     if (!name.trim()) return null;
-    return null;
+
+    try {
+      // Simular verificación de base de datos
+      // En producción, reemplazar con:
+      // let query = supabase.from("rsvp_confirmations").select("*").ilike("name", name.trim());
+      //
+      // if (phone && phone.trim()) {
+      //   const { data: phoneData } = await supabase.from("rsvp_confirmations").select("*").eq("phone", phone.trim());
+      //   if (phoneData && phoneData.length > 0) return phoneData[0];
+      // }
+      //
+      // const { data, error } = await query;
+      // if (error) throw error;
+      // return data && data.length > 0 ? data[0] : null;
+
+      // Por ahora, simulamos que no existe para que funcione sin BD
+      return null;
+    } catch (error) {
+      console.error("Error checking existing RSVP:", error);
+      return null;
+    }
+  };
+
+  // Función para guardar en base de datos
+  const saveToDatabase = async (data) => {
+    try {
+      // CONEXIÓN REAL A SUPABASE
+      const { error } = await supabase.from("rsvp_confirmations").insert([
+        {
+          name: data.name,
+          email: "no-email@temp.com", // Valor temporal ya que la tabla requiere email
+          phone: data.phone || null,
+          guests: 1, // Valor por defecto ya que la tabla requiere guests
+          dietary_restrictions: data.dietary_restrictions || null,
+          message: data.message || null,
+        },
+      ]);
+
+      if (error) throw error;
+
+      console.log("Datos guardados en BD exitosamente");
+    } catch (error) {
+      console.error("Error guardando en BD:", error);
+      throw error;
+    }
   };
 
   useEffect(() => {
@@ -76,8 +130,8 @@ export default function RSVPSection() {
     message += `👤 *Nombre:* ${data.name}\n`;
     message += `📱 *Teléfono:* ${data.phone || "No proporcionado"}\n`;
 
-    if (data.dietary) {
-      message += `🍽️ *Restricciones alimentarias:* ${data.dietary}\n`;
+    if (data.dietary_restrictions) {
+      message += `🍽️ *Restricciones alimentarias:* ${data.dietary_restrictions}\n`;
     }
 
     if (data.message) {
@@ -116,18 +170,25 @@ export default function RSVPSection() {
       setLoading(true);
       setError("");
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // 1. Guardar en base de datos
+      await saveToDatabase(formData);
+
+      // 2. Enviar por WhatsApp
       sendToWhatsApp(formData);
+
+      // 3. Mostrar confirmación
       setSubmitted(true);
-      setIsFlipped(false); // Resetear el flip cuando se envía
+      setIsFlipped(false);
     } catch (error) {
       console.error("Error submitting RSVP:", error);
       setError(
         "Hubo un error al guardar la confirmación. El WhatsApp se abrirá de todas formas."
       );
+
+      // Enviar por WhatsApp aunque falle la BD
       sendToWhatsApp(formData);
       setSubmitted(true);
-      setIsFlipped(false); // También resetear en caso de error
+      setIsFlipped(false);
     } finally {
       setLoading(false);
     }
@@ -279,6 +340,43 @@ export default function RSVPSection() {
                   : `Tu confirmación se envió por WhatsApp. ¡No podemos esperar a celebrar contigo en la fiesta de ${nombre}!`}
               </p>
 
+              {/* Mostrar datos confirmados */}
+              <div className="bg-white/60 backdrop-blur-xl border border-yellow-300/40 rounded-2xl p-4 mb-6 text-left">
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-yellow-800">
+                    <User className="w-4 h-4" />
+                    <span>
+                      <strong>Nombre:</strong> {rsvpData.name}
+                    </span>
+                  </div>
+                  {rsvpData.phone && (
+                    <div className="flex items-center gap-2 text-yellow-800">
+                      <Phone className="w-4 h-4" />
+                      <span>
+                        <strong>Teléfono:</strong> {rsvpData.phone}
+                      </span>
+                    </div>
+                  )}
+                  {rsvpData.dietary_restrictions && (
+                    <div className="flex items-center gap-2 text-yellow-800">
+                      <Utensils className="w-4 h-4" />
+                      <span>
+                        <strong>Restricciones:</strong>{" "}
+                        {rsvpData.dietary_restrictions}
+                      </span>
+                    </div>
+                  )}
+                  {rsvpData.message && (
+                    <div className="flex items-start gap-2 text-yellow-800">
+                      <Heart className="w-4 h-4 mt-1" />
+                      <span>
+                        <strong>Mensaje:</strong> {rsvpData.message}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <button
                 onClick={() => {
                   setSubmitted(false);
@@ -354,7 +452,7 @@ export default function RSVPSection() {
                         setFormData({
                           name: "",
                           phone: "",
-                          dietary: "",
+                          dietary_restrictions: "",
                           message: "",
                         });
                       }}
@@ -426,7 +524,6 @@ export default function RSVPSection() {
                     para que podamos preparar la fiesta perfecta de {nombre}
                   </p>
 
-                  {/* Botón dorado para voltear la tarjeta */}
                   <button
                     onClick={() => setIsFlipped(true)}
                     className="golden-button text-yellow-900 px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center gap-3 mx-auto"
@@ -448,7 +545,6 @@ export default function RSVPSection() {
                         <Send className="w-5 h-5" />
                         Confirmar Asistencia
                       </h3>
-                      {/* Botón para volver */}
                       <button
                         onClick={() => setIsFlipped(false)}
                         className="text-yellow-600 hover:text-yellow-800 transition-colors"
@@ -520,8 +616,8 @@ export default function RSVPSection() {
                         </label>
                         <input
                           type="text"
-                          name="dietary"
-                          value={formData.dietary}
+                          name="dietary_restrictions"
+                          value={formData.dietary_restrictions}
                           onChange={handleChange}
                           disabled={loading}
                           className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-xl text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all text-sm"
@@ -645,42 +741,40 @@ export default function RSVPSection() {
                         </div>
                       )}
 
-                      <div className="grid md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2">
-                            <User className="w-4 h-4 text-yellow-600" />
-                            <span className="text-sm">Nombre Completo *</span>
-                            {checkingExisting && (
-                              <Loader2 className="w-3 h-3 animate-spin text-yellow-600" />
-                            )}
-                          </label>
-                          <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            disabled={loading}
-                            className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-lg text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
-                            placeholder="Tu nombre completo"
-                          />
-                        </div>
+                      <div className="mb-4">
+                        <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2">
+                          <User className="w-4 h-4 text-yellow-600" />
+                          <span className="text-sm">Nombre Completo *</span>
+                          {checkingExisting && (
+                            <Loader2 className="w-3 h-3 animate-spin text-yellow-600" />
+                          )}
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
+                          disabled={loading}
+                          className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-lg text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
+                          placeholder="Tu nombre completo"
+                        />
+                      </div>
 
-                        <div>
-                          <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2">
-                            <Phone className="w-4 h-4 text-yellow-600" />
-                            <span className="text-sm">Teléfono</span>
-                          </label>
-                          <input
-                            type="tel"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            disabled={loading}
-                            className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-lg text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
-                            placeholder={telefono}
-                          />
-                        </div>
+                      <div className="mb-4">
+                        <label className="block text-yellow-800 font-medium mb-2 flex items-center gap-2">
+                          <Phone className="w-4 h-4 text-yellow-600" />
+                          <span className="text-sm">Teléfono</span>
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          disabled={loading}
+                          className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-lg text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
+                          placeholder={telefono}
+                        />
                       </div>
 
                       <div className="mb-4">
@@ -692,8 +786,8 @@ export default function RSVPSection() {
                         </label>
                         <input
                           type="text"
-                          name="dietary"
-                          value={formData.dietary}
+                          name="dietary_restrictions"
+                          value={formData.dietary_restrictions}
                           onChange={handleChange}
                           disabled={loading}
                           className="w-full px-3 py-2 bg-white/50 border border-yellow-300/50 rounded-lg text-yellow-900 placeholder-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all backdrop-blur-sm disabled:opacity-50 text-sm"
@@ -721,7 +815,7 @@ export default function RSVPSection() {
 
                       <button
                         onClick={handleSubmit}
-                        disabled={loading}
+                        disabled={loading || !formData.name.trim()}
                         className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 text-yellow-900 px-6 py-3 rounded-xl font-bold text-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl hover:scale-105"
                         style={{
                           boxShadow: loading

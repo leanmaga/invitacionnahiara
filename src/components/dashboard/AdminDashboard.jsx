@@ -13,21 +13,13 @@ import {
   AdminSongsTable,
 } from "@/components/dashboard";
 
-// 🎯 IMPORTAR LOS MODALES PERSONALIZADOS
+// IMPORTAR LOS MODALES PERSONALIZADOS
 import {
   DeleteSongModal,
   DeleteConfirmationModal,
   SuccessToast,
   ErrorToast,
 } from "@/components/ui/CustomModals";
-
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-
-if (!ADMIN_PASSWORD) {
-  console.error(
-    "❌ NEXT_PUBLIC_ADMIN_PASSWORD no está configurado en .env.local"
-  );
-}
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,11 +35,19 @@ export default function AdminDashboard() {
   const [isDeletingConfirmation, setIsDeletingConfirmation] = useState(false);
   const [stats, setStats] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterGuests, setFilterGuests] = useState("all");
+  const [filterType, setFilterType] = useState("all"); // Renombrado de filterGuests
 
-  const { nombre } = useQuinceaneraConfig();
+  // Usar hook centralizado para configuración
+  const { nombre, adminPassword } = useQuinceaneraConfig();
 
-  // 🎭 ESTADOS PARA LOS MODALES PERSONALIZADOS
+  // Validación de contraseña admin
+  if (!adminPassword) {
+    console.error(
+      "NEXT_PUBLIC_ADMIN_PASSWORD no está configurado en .env.local"
+    );
+  }
+
+  // ESTADOS PARA LOS MODALES PERSONALIZADOS
   const [deleteModal, setDeleteModal] = useState({
     isOpen: false,
     type: null, // 'song' | 'confirmation'
@@ -73,7 +73,7 @@ export default function AdminDashboard() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
+    if (password === adminPassword) {
       localStorage.setItem("admin_authenticated", "true");
       setIsAuthenticated(true);
       setAuthError("");
@@ -118,6 +118,7 @@ export default function AdminDashboard() {
     }
   };
 
+  // CORREGIDA: función calculateStats sin referencias a guests
   const calculateStats = (rsvpData, songsData = songs) => {
     const withDietary = rsvpData.filter(
       (item) => item.dietary_restrictions
@@ -134,7 +135,7 @@ export default function AdminDashboard() {
     });
   };
 
-  // 🎯 MOSTRAR TOASTS
+  // MOSTRAR TOASTS
   const showSuccessToast = (message) => {
     setSuccessToast({ isVisible: true, message });
     setTimeout(() => {
@@ -149,7 +150,7 @@ export default function AdminDashboard() {
     }, 4000);
   };
 
-  // 🗑️ ELIMINAR CONFIRMACIÓN CON MODAL PERSONALIZADO
+  // ELIMINAR CONFIRMACIÓN CON MODAL PERSONALIZADO
   const deleteConfirmation = (id) => {
     const confirmation = confirmations.find((c) => c.id === id);
     setDeleteModal({
@@ -165,7 +166,7 @@ export default function AdminDashboard() {
 
     setIsDeletingConfirmation(true);
     try {
-      console.log("🗑️ Intentando eliminar confirmación ID:", id);
+      console.log("Intentando eliminar confirmación ID:", id);
 
       const { data, error } = await supabase
         .from("rsvp_confirmations")
@@ -173,20 +174,20 @@ export default function AdminDashboard() {
         .eq("id", id);
 
       if (error) {
-        console.error("❌ Error de Supabase:", error);
+        console.error("Error de Supabase:", error);
         throw error;
       }
 
-      console.log("✅ Confirmación eliminada exitosamente:", data);
+      console.log("Confirmación eliminada exitosamente:", data);
 
       const updated = confirmations.filter((c) => c.id !== id);
       setConfirmations(updated);
       calculateStats(updated, songs);
 
       setDeleteModal({ isOpen: false, type: null, item: null });
-      showSuccessToast("✨ Confirmación eliminada exitosamente");
+      showSuccessToast("Confirmación eliminada exitosamente");
     } catch (error) {
-      console.error("❌ Error al eliminar confirmación:", error);
+      console.error("Error al eliminar confirmación:", error);
       setDeleteModal({ isOpen: false, type: null, item: null });
 
       let errorMessage = "No se pudo eliminar la confirmación";
@@ -204,7 +205,7 @@ export default function AdminDashboard() {
     }
   };
 
-  // 🎵 ELIMINAR CANCIÓN CON MODAL PERSONALIZADO
+  // ELIMINAR CANCIÓN CON MODAL PERSONALIZADO
   const deleteSong = (id) => {
     const song = songs.find((s) => s.id === id);
     setDeleteModal({
@@ -220,8 +221,8 @@ export default function AdminDashboard() {
 
     setIsDeleting(true);
     try {
-      console.log("🗑️ Intentando eliminar canción ID:", id);
-      console.log("📊 Canciones actuales:", songs.length);
+      console.log("Intentando eliminar canción ID:", id);
+      console.log("Canciones actuales:", songs.length);
 
       const { data, error } = await supabase
         .from("song_requests")
@@ -229,25 +230,25 @@ export default function AdminDashboard() {
         .eq("id", id);
 
       if (error) {
-        console.error("❌ Error de Supabase:", error);
-        console.error("❌ Código de error:", error.code);
-        console.error("❌ Detalles:", error.details);
+        console.error("Error de Supabase:", error);
+        console.error("Código de error:", error.code);
+        console.error("Detalles:", error.details);
         throw error;
       }
 
-      console.log("✅ Canción eliminada exitosamente:", data);
+      console.log("Canción eliminada exitosamente:", data);
 
       // Actualizar estado local
       const updated = songs.filter((s) => s.id !== id);
       setSongs(updated);
       calculateStats(confirmations, updated);
 
-      console.log("📊 Canciones después de eliminar:", updated.length);
+      console.log("Canciones después de eliminar:", updated.length);
 
       setDeleteModal({ isOpen: false, type: null, item: null });
-      showSuccessToast("🎵 Canción eliminada exitosamente");
+      showSuccessToast("Canción eliminada exitosamente");
     } catch (error) {
-      console.error("❌ Error al eliminar canción:", error);
+      console.error("Error al eliminar canción:", error);
 
       let errorMessage = "No se pudo eliminar la canción";
       if (error.message.includes("policy")) {
@@ -265,8 +266,8 @@ export default function AdminDashboard() {
     }
   };
 
+  // CORREGIDA: función exportToCSV con campos exactos
   const exportToCSV = () => {
-    // ✅ Solo exportamos los campos que existen
     const headers = ["Nombre", "Teléfono", "Restricciones", "Mensaje", "Fecha"];
     const rows = confirmations.map((item) => [
       item.name,
@@ -289,16 +290,17 @@ export default function AdminDashboard() {
     link.click();
   };
 
+  // CORREGIDA: filtros actualizados sin referencias a guests
   const filteredConfirmations = confirmations.filter((item) => {
     const matchSearch =
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.phone && item.phone.includes(searchTerm));
 
     const matchFilter =
-      filterGuests === "all" ||
-      (filterGuests === "dietary" && item.dietary_restrictions) ||
-      (filterGuests === "message" && item.message) ||
-      (filterGuests === "phone" && item.phone);
+      filterType === "all" ||
+      (filterType === "dietary" && item.dietary_restrictions) ||
+      (filterType === "message" && item.message) ||
+      (filterType === "phone" && item.phone);
 
     return matchSearch && matchFilter;
   });
@@ -369,8 +371,8 @@ export default function AdminDashboard() {
         <AdminFilters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          filterGuests={filterGuests}
-          setFilterGuests={setFilterGuests}
+          filterGuests={filterType} // Nota: el prop sigue siendo filterGuests por compatibilidad
+          setFilterGuests={setFilterType} // pero internamente usa filterType
           exportToCSV={exportToCSV}
           hasData={confirmations.length > 0}
         />
@@ -386,7 +388,7 @@ export default function AdminDashboard() {
         />
       </main>
 
-      {/* 🎭 MODALES PERSONALIZADOS */}
+      {/* MODALES PERSONALIZADOS */}
       <DeleteSongModal
         isOpen={deleteModal.isOpen && deleteModal.type === "song"}
         onClose={() =>

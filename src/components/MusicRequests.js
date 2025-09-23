@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import {
   Music,
@@ -8,53 +10,7 @@ import {
   AlertCircle,
   Sparkles,
 } from "lucide-react";
-
-const supabase = {
-  from: (table) => ({
-    select: (columns) => ({
-      order: (column, options) => ({
-        limit: (count) => ({
-          then: (resolve) => {
-            resolve({
-              data: [
-                {
-                  id: 1,
-                  song_name: "Su Florencia",
-                  artist_name: "Marylin",
-                  message: "Esta canción me recuerda a mis amigas",
-                  created_at: new Date().toISOString(),
-                },
-                {
-                  id: 2,
-                  song_name: "Soy cordobés",
-                  artist_name: "Rodrigo",
-                  message: null,
-                  created_at: new Date(Date.now() - 3600000).toISOString(),
-                },
-              ],
-              error: null,
-            });
-          },
-        }),
-      }),
-    }),
-    insert: (data) => ({
-      select: () => ({
-        then: (resolve) => {
-          const newSong = {
-            id: Date.now(),
-            ...data[0],
-            created_at: new Date().toISOString(),
-          };
-          resolve({
-            data: [newSong],
-            error: null,
-          });
-        },
-      }),
-    }),
-  }),
-};
+import { supabase } from "@/lib/supabase";
 
 export default function MusicRequests() {
   const [songRequest, setSongRequest] = useState("");
@@ -81,10 +37,17 @@ export default function MusicRequests() {
         .order("created_at", { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error loading songs:", error);
+        throw error;
+      }
+
+      console.log("Canciones cargadas:", data);
       setDbSongs(data || []);
     } catch (error) {
       console.error("Error loading songs:", error);
+      // En caso de error, mostrar datos vacíos en lugar de fallar completamente
+      setDbSongs([]);
     } finally {
       setLoadingSongs(false);
     }
@@ -96,6 +59,12 @@ export default function MusicRequests() {
     try {
       setLoading(true);
       setError("");
+
+      console.log("Enviando canción:", {
+        song_name: songRequest.trim(),
+        artist_name: artistRequest.trim() || null,
+        message: message.trim() || null,
+      });
 
       const { data, error } = await supabase
         .from("song_requests")
@@ -110,11 +79,14 @@ export default function MusicRequests() {
         .select();
 
       if (error) {
-        console.error("Error details:", error);
+        console.error("Error de Supabase:", error);
         throw error;
       }
 
+      console.log("Canción guardada exitosamente:", data);
+
       if (data && data[0]) {
+        // Agregar la nueva canción al inicio de la lista
         setDbSongs((prev) => [data[0], ...prev]);
       }
 
@@ -123,16 +95,24 @@ export default function MusicRequests() {
       setArtistRequest("");
       setMessage("");
 
+      // Resetear el formulario después de 3 segundos
       setTimeout(() => {
         setShowForm(false);
         setSubmitted(false);
-        setIsFlipped(false); // Resetear flip después del éxito
+        setIsFlipped(false);
       }, 3000);
     } catch (error) {
       console.error("Error submitting song:", error);
-      setError(
-        "Hubo un error al enviar tu solicitud. Por favor intenta de nuevo."
-      );
+      let errorMessage =
+        "Hubo un error al enviar tu solicitud. Por favor intenta de nuevo.";
+
+      if (error.message.includes("policy")) {
+        errorMessage = "Error de permisos en la base de datos";
+      } else if (error.message.includes("network")) {
+        errorMessage = "Error de conexión a internet";
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -145,19 +125,19 @@ export default function MusicRequests() {
   };
 
   const handleShowForm = () => {
-    console.log("🎵 Showing form...", { showForm, isFlipped }); // Debug mejorado
+    console.log("Mostrando formulario...", { showForm, isFlipped });
     setShowForm(true);
   };
 
   const handleCloseForm = () => {
-    console.log("❌ Closing form...", { showForm, isFlipped }); // Debug mejorado
+    console.log("Cerrando formulario...", { showForm, isFlipped });
     setShowForm(false);
   };
 
   const handleFlipBack = () => {
-    console.log("⬅️ Going back to front...", { showForm, isFlipped }); // Debug nuevo
+    console.log("Volviendo atrás...", { showForm, isFlipped });
     setIsFlipped(false);
-    setShowForm(false); // También resetear el form al volver
+    setShowForm(false);
   };
 
   return (
@@ -392,13 +372,20 @@ export default function MusicRequests() {
                         <div className="inline-flex items-center gap-3 bg-white/40 backdrop-blur-sm rounded-full px-6 py-3 border border-yellow-300/40">
                           <Headphones className="w-5 h-5 text-yellow-700" />
                           <span className="text-yellow-800 font-semibold">
-                            {getSongsCountText(dbSongs.length)} agregadas
+                            {loadingSongs
+                              ? "Cargando..."
+                              : getSongsCountText(dbSongs.length)}{" "}
+                            agregadas
                           </span>
                         </div>
                       </div>
 
                       {/* Lista de canciones recientes */}
-                      {dbSongs.length > 0 && (
+                      {loadingSongs ? (
+                        <div className="flex items-center justify-center py-8">
+                          <Loader2 className="w-8 h-8 animate-spin text-yellow-600" />
+                        </div>
+                      ) : dbSongs.length > 0 ? (
                         <div className="bg-white/40 backdrop-blur-sm border border-yellow-300/40 rounded-2xl p-4">
                           <h4 className="text-yellow-800 font-bold text-sm mb-3 flex items-center gap-2">
                             <Music className="w-4 h-4" />
@@ -430,6 +417,13 @@ export default function MusicRequests() {
                               </div>
                             ))}
                           </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-8">
+                          <Music className="w-12 h-12 text-yellow-400/60 mx-auto mb-4" />
+                          <p className="text-yellow-600">
+                            Aún no hay canciones solicitadas. ¡Sé el primero!
+                          </p>
                         </div>
                       )}
                     </div>
@@ -627,7 +621,10 @@ export default function MusicRequests() {
                         <div className="inline-flex items-center gap-3 bg-white/40 backdrop-blur-sm rounded-full px-8 py-4 border border-yellow-300/40">
                           <Headphones className="w-6 h-6 text-yellow-700" />
                           <span className="text-yellow-800 font-semibold text-xl">
-                            {getSongsCountText(dbSongs.length)} agregadas
+                            {loadingSongs
+                              ? "Cargando..."
+                              : getSongsCountText(dbSongs.length)}{" "}
+                            agregadas
                           </span>
                         </div>
                       </div>

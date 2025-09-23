@@ -4,17 +4,23 @@ import { useState } from "react";
 import { MapPin, Navigation, Phone, Clock } from "lucide-react";
 
 export default function LocationSection() {
-  // Configuración - reemplaza con tu hook useQuinceaneraConfig()
-  const lugar = "Salón Crystal";
-  const direccion = "Av. Principal 123, Córdoba";
-  const telefono = "(351) 123-4567";
-  const horaEvento = "7:00 PM - 2:00 AM";
+  // Obtener datos de variables de entorno
+  const lugar = process.env.NEXT_PUBLIC_LUGAR_EVENTO || "Victoria 2051";
+  const direccion =
+    process.env.NEXT_PUBLIC_DIRECCION_EVENTO ||
+    "Entre Itaqui y Martín Fierro, B1716 Libertad, Merlo.";
+  const telefono = process.env.NEXT_PUBLIC_TELEFONO || "+54 11 2776-4823";
+  const horaEvento =
+    process.env.NEXT_PUBLIC_HORA_EVENTO || "10:00 AM - 19:00 PM";
 
   // Generar URLs de mapas dinámicamente basado en la dirección
+  const direccionCompleta = `${lugar}, ${direccion}`;
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    direccion
+    direccionCompleta
   )}`;
-  const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(direccion)}`;
+  const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(
+    direccionCompleta
+  )}`;
 
   // CSS para animaciones
   const styles = `
@@ -151,7 +157,8 @@ export default function LocationSection() {
                   <h3 className="font-serif text-2xl font-bold text-yellow-800 mb-2">
                     {lugar}
                   </h3>
-                  <p className="text-yellow-700">
+                  <p className="text-yellow-700 px-4">{direccion}</p>
+                  <p className="text-yellow-600 text-sm mt-2">
                     Haz clic para ver el mapa interactivo
                   </p>
                 </div>
@@ -163,6 +170,14 @@ export default function LocationSection() {
 
                 <div className="absolute bottom-4 left-4">
                   <div className="w-4 h-4 bg-yellow-500 rounded-full pulse-element"></div>
+                </div>
+
+                <div className="absolute top-4 left-4">
+                  <div className="w-6 h-6 border-2 border-amber-400 rounded-full opacity-70"></div>
+                </div>
+
+                <div className="absolute bottom-4 right-4">
+                  <div className="w-3 h-3 bg-amber-400 rounded-full opacity-80"></div>
                 </div>
               </div>
 
@@ -178,6 +193,19 @@ export default function LocationSection() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Additional Info Section */}
+        <div className="mt-16 text-center fade-in-up">
+          <div className="bg-white/50 backdrop-blur-xl border border-yellow-300/40 rounded-2xl p-6 max-w-2xl mx-auto">
+            <h4 className="font-serif text-xl font-bold text-yellow-800 mb-3">
+              Información Adicional
+            </h4>
+            <p className="text-yellow-700">
+              Te esperamos para celebrar juntos este día tan especial. No
+              olvides confirmar tu asistencia y revisa los detalles del evento.
+            </p>
           </div>
         </div>
       </div>
