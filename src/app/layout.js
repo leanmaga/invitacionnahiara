@@ -35,21 +35,21 @@ export const metadata = {
       : "http://localhost:3000"
   ),
 
-  title: `${nombreQuinceanera} - Mis 16 Años`,
+  title: `${nombreQuinceanera} - Mis 15 Años`,
   description: "Una celebración única",
 
   // Meta tags para redes sociales
   openGraph: {
-    title: `${nombreQuinceanera} - Mis 16 Años`,
+    title: `${nombreQuinceanera} - Mis 15 Años`,
     description: "Una celebración única",
     url: "/", // Ahora es relativo a metadataBase
-    siteName: `16 de ${nombreQuinceanera}`,
+    siteName: `15 de ${nombreQuinceanera}`,
     images: [
       {
         url: "/favicon.ico", // Relativo a metadataBase
         width: 32,
         height: 32,
-        alt: `${nombreQuinceanera} - Mis 16 Años`,
+        alt: `${nombreQuinceanera} - Mis 15 Años`,
       },
     ],
     locale: "es_ES",
@@ -59,7 +59,7 @@ export const metadata = {
   // Twitter Cards
   twitter: {
     card: "summary",
-    title: `${nombreQuinceanera} - Mis 16 Años`,
+    title: `${nombreQuinceanera} - Mis 15 Años`,
     description: "Una celebración única",
     images: ["/favicon.ico"], // Relativo a metadataBase
   },
@@ -106,7 +106,7 @@ export default function RootLayout({ children }) {
         <meta name="author" content={nombreQuinceanera} />
         <meta
           name="keywords"
-          content={`16, ${nombreQuinceanera.toLowerCase()}, 16 años, celebración, fiesta`}
+          content={`15, ${nombreQuinceanera.toLowerCase()}, 15 años, celebración, fiesta`}
         />
 
         {/* Preload de recursos importantes */}

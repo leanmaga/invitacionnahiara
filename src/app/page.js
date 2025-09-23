@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import HeroSection from "@/components/HeroSection";
 import CountdownSection from "@/components/CountdownSection";
 import EventDetails from "@/components/EventDetails";
@@ -12,10 +12,21 @@ import Navigation from "@/components/Navigation";
 import { AudioProvider } from "@/components/AudioContext";
 import MasonryGallery from "@/components/MasonryGallery";
 
-export default function Home() {
+// ⭐ NUEVOS IMPORTS
+import { LoadingProvider, useLoading } from "@/components/PageLoader";
+import PageLoader from "@/components/PageLoader";
+
+// ⭐ NUEVO: Componente del contenido principal
+const MainContent = () => {
+  const { isLoading } = useLoading();
+
   return (
-    <AudioProvider audioSrc="/IchikoAoba.mp3">
-      <div className="min-h-screen w-full overflow-x-hidden">
+    <>
+      <AnimatePresence mode="wait">
+        {isLoading && <PageLoader />}
+      </AnimatePresence>
+
+      {!isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -29,7 +40,7 @@ export default function Home() {
             <HeroSection />
             <CountdownSection />
             <EventDetails />
-            <MasonryGallery />
+            <MasonryGallery /> {/* Tu galería ya modificada */}
             <DressCode />
             <LocationSection />
             <MusicRequests />
@@ -37,7 +48,19 @@ export default function Home() {
             <Footer />
           </main>
         </motion.div>
-      </div>
-    </AudioProvider>
+      )}
+    </>
+  );
+};
+
+export default function Home() {
+  return (
+    <LoadingProvider>
+      <AudioProvider audioSrc="/IchikoAoba.mp3">
+        <div className="min-h-screen w-full overflow-x-hidden">
+          <MainContent />
+        </div>
+      </AudioProvider>
+    </LoadingProvider>
   );
 }

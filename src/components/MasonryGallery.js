@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, ZoomIn } from "lucide-react";
+import { useImageLoader } from "@/components/PageLoader"; // ⭐ NUEVO: Importar el hook
+import Image from "next/image";
 
 const MasonryGallery = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -7,6 +9,15 @@ const MasonryGallery = () => {
   const [illuminatedImages, setIlluminatedImages] = useState(new Set());
   const [imageHeights, setImageHeights] = useState({});
   const [isMobile, setIsMobile] = useState(false);
+
+  // ⭐ NUEVO: Crear array de URLs para el sistema de carga
+  const imageUrls = Array.from(
+    { length: 51 },
+    (_, i) => `/assets/${i + 1}.jpg`
+  );
+
+  // ⭐ NUEVO: Usar el hook para rastrear la carga de imágenes
+  const imagesLoaded = useImageLoader(imageUrls);
 
   // Check if mobile
   useEffect(() => {
@@ -101,9 +112,11 @@ const MasonryGallery = () => {
             onMouseLeave={() => !isMobile && setHoveredImage(null)}
             onClick={() => handleImageClick(image)}
           >
-            <img
+            <Image
               src={image.src}
               alt={image.alt}
+              width={auto}
+              height={auto}
               className="w-full h-full object-cover transition-all duration-500 ease-out"
               style={{
                 filter: isImageIlluminated(image.id)
@@ -113,6 +126,9 @@ const MasonryGallery = () => {
                   ? "scale(1.02)"
                   : "scale(1)",
               }}
+              // ⭐ OPCIONAL: Mejorar carga con priority para las primeras imágenes
+              priority={image.id <= 6}
+              loading={image.id <= 6 ? "eager" : "lazy"}
             />
 
             {/* Zoom Icon Container */}
