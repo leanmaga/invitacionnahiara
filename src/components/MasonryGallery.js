@@ -227,8 +227,8 @@ const MasonryGallery = () => {
   };
 
   return (
-    <main className="masonry-gallery">
-      <section
+    <div className="masonry-gallery" role="main">
+      <div
         className="masonry-grid"
         role="img"
         aria-label="Galería de fotos de Nahiara"
@@ -260,7 +260,7 @@ const MasonryGallery = () => {
               loading="eager"
             />
 
-            <span className="image-overlay">
+            <div className="image-overlay">
               {(isImageIlluminated(image.id) ||
                 (!isMobile && hoveredImage === image.id)) && (
                 <button
@@ -279,13 +279,13 @@ const MasonryGallery = () => {
                   />
                 </button>
               )}
-            </span>
+            </div>
           </button>
         ))}
-      </section>
+      </div>
 
       {selectedImage && (
-        <section
+        <div
           className="modal-overlay"
           role="dialog"
           aria-modal="true"
@@ -294,7 +294,7 @@ const MasonryGallery = () => {
           onKeyDown={handleModalKeyDown}
           tabIndex={-1}
         >
-          <article
+          <div
             className="polaroid-wrapper"
             onClick={(e) => e.stopPropagation()}
           >
@@ -304,10 +304,9 @@ const MasonryGallery = () => {
               {/* Frente del polaroid */}
               <div className="polaroid-front">
                 <div className="polaroid-content">
-                  <Image
+                  <img
                     src={selectedImage.src}
                     alt={selectedImage.alt}
-                    fill
                     className="polaroid-image"
                   />
 
@@ -440,7 +439,7 @@ const MasonryGallery = () => {
               {/* Reverso del polaroid */}
               <div className="polaroid-back">
                 <div className="polaroid-back-content">
-                  <header className="back-header">
+                  <div className="back-header">
                     <h3 className="back-title">
                       <Heart size={18} />
                       Para Nahiara
@@ -458,7 +457,7 @@ const MasonryGallery = () => {
                     >
                       <RotateCcw size={16} />
                     </button>
-                  </header>
+                  </div>
 
                   <div
                     className="messages-area"
@@ -484,7 +483,7 @@ const MasonryGallery = () => {
                           <div className="messages-container">
                             {comments[selectedImage.id].map(
                               (comment, index) => (
-                                <article
+                                <div
                                   key={comment.id}
                                   className="handwritten-message"
                                   role="listitem"
@@ -499,7 +498,7 @@ const MasonryGallery = () => {
                                     {comment.comment_text}
                                   </blockquote>
 
-                                  <footer className="message-signature-area">
+                                  <div className="message-signature-area">
                                     <cite
                                       className={`message-signature ${
                                         index % 2 === 0
@@ -516,13 +515,13 @@ const MasonryGallery = () => {
                                     >
                                       {formatDate(comment.created_at)}
                                     </time>
-                                  </footer>
+                                  </div>
 
                                   {index <
                                     comments[selectedImage.id].length - 1 && (
                                     <hr className="message-separator" />
                                   )}
-                                </article>
+                                </div>
                               )
                             )}
                           </div>
@@ -553,10 +552,10 @@ const MasonryGallery = () => {
             >
               <X size={20} />
             </button>
-          </article>
-        </section>
+          </div>
+        </div>
       )}
-    </main>
+    </div>
   );
 };
 
