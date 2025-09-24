@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { X, ZoomIn } from "lucide-react";
+import { X, ZoomIn, MessageCircle, Send, Heart, RotateCcw } from "lucide-react";
 import Image from "next/image";
 import { useLoading } from "@/components/PageLoader";
+import "../app/masonry.css";
 
 const MasonryGallery = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -9,6 +10,17 @@ const MasonryGallery = () => {
   const [illuminatedImages, setIlluminatedImages] = useState(new Set());
   const [imageHeights, setImageHeights] = useState({});
   const [isMobile, setIsMobile] = useState(false);
+
+  // Estados para comentarios y flip
+  const [comments, setComments] = useState({});
+  const [loadingComments, setLoadingComments] = useState({});
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [newComment, setNewComment] = useState({
+    authorName: "",
+    commentText: "",
+  });
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   const { updateImageCount, incrementLoadedImages } = useLoading();
   const loadedCount = useRef(0);
@@ -40,6 +52,78 @@ const MasonryGallery = () => {
     alt: `Image ${i + 1}`,
   }));
 
+  // Función para cargar comentarios de una imagen
+  const loadComments = async (imageId) => {
+    if (comments[imageId]) return;
+
+    setLoadingComments((prev) => ({ ...prev, [imageId]: true }));
+
+    try {
+      const response = await fetch(`/api/image-comments?imageId=${imageId}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setComments((prev) => ({
+          ...prev,
+          [imageId]: data.comments || [],
+        }));
+      } else {
+        console.error("Error loading comments:", data.error);
+      }
+    } catch (error) {
+      console.error("Error loading comments:", error);
+    } finally {
+      setLoadingComments((prev) => ({ ...prev, [imageId]: false }));
+    }
+  };
+
+  // Función para enviar un nuevo comentario
+  const submitComment = async () => {
+    if (!newComment.authorName.trim() || !newComment.commentText.trim()) {
+      alert("Por favor completa todos los campos");
+      return;
+    }
+
+    setSubmittingComment(true);
+
+    try {
+      const response = await fetch("/api/image-comments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageId: selectedImage.id,
+          authorName: newComment.authorName.trim(),
+          commentText: newComment.commentText.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setComments((prev) => ({
+          ...prev,
+          [selectedImage.id]: [...(prev[selectedImage.id] || []), data.comment],
+        }));
+
+        setNewComment({ authorName: "", commentText: "" });
+        setShowCommentForm(false);
+
+        setTimeout(() => {
+          setIsFlipped(true);
+        }, 300);
+      } else {
+        alert(data.error || "Error al enviar comentario");
+      }
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+      alert("Error al enviar comentario");
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
   const handleImageLoad = () => {
     loadedCount.current += 1;
     incrementLoadedImages();
@@ -52,12 +136,39 @@ const MasonryGallery = () => {
 
   const openModal = (image) => {
     setSelectedImage(image);
+    loadComments(image.id);
+    setIsFlipped(false);
+    setShowCommentForm(false);
     document.body.style.overflow = "hidden";
   };
 
   const closeModal = () => {
     setSelectedImage(null);
+    setIsFlipped(false);
+    setShowCommentForm(false);
+    setNewComment({ authorName: "", commentText: "" });
     document.body.style.overflow = "unset";
+  };
+
+  const handleKeyDown = (event, callback) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      callback();
+    }
+  };
+
+  const handleModalKeyDown = (event) => {
+    if (event.key === "Escape") {
+      closeModal();
+    }
+  };
+
+  const handleMessageClick = () => {
+    setShowCommentForm(true);
+  };
+
+  const handleViewMessages = () => {
+    setIsFlipped(true);
   };
 
   const handleImageClick = (image) => {
@@ -94,153 +205,359 @@ const MasonryGallery = () => {
     };
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getMessagesText = (imageId) => {
+    const messageCount = comments[imageId]?.length || 0;
+    if (messageCount === 0) {
+      return "aún no tiene mensajes para ver, escribele uno a nahiara";
+    } else if (messageCount === 1) {
+      return "ver 1 mensaje";
+    } else {
+      return `ver ${messageCount} mensajes`;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-amber-50 to-yellow-50 overflow-hidden">
-      <div
-        className="masonry-grid p-1 md:p-2"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-          gridAutoRows: "10px",
-          gap: "2px",
-        }}
+    <main className="masonry-gallery">
+      <section
+        className="masonry-grid"
+        role="img"
+        aria-label="Galería de fotos de Nahiara"
       >
         {images.map((image) => (
-          <div
+          <button
             key={image.id}
-            className="relative group cursor-pointer overflow-hidden"
+            type="button"
+            className={`masonry-item ${
+              isImageIlluminated(image.id) ? "illuminated" : ""
+            }`}
             style={getImageStyle(image.id)}
             onMouseEnter={() => !isMobile && setHoveredImage(image.id)}
             onMouseLeave={() => !isMobile && setHoveredImage(null)}
             onClick={() => handleImageClick(image)}
+            onKeyDown={(e) => handleKeyDown(e, () => handleImageClick(image))}
+            aria-label={`Ver imagen ${image.id} de Nahiara`}
+            tabIndex={0}
           >
             <Image
               src={image.src}
               alt={image.alt}
               fill
               sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-              className="w-full h-full object-cover transition-all duration-500 ease-out"
-              style={{
-                filter: isImageIlluminated(image.id)
-                  ? "brightness(1)"
-                  : "brightness(0.4)",
-                transform: isImageIlluminated(image.id)
-                  ? "scale(1.02)"
-                  : "scale(1)",
-              }}
+              className="masonry-image"
               onLoad={handleImageLoad}
               onError={handleImageError}
               priority={true}
               loading="eager"
             />
 
-            <div className="absolute inset-0">
+            <span className="image-overlay">
               {(isImageIlluminated(image.id) ||
                 (!isMobile && hoveredImage === image.id)) && (
-                <div
-                  className="absolute bottom-2 right-2"
+                <button
+                  type="button"
+                  className="zoom-button control-button"
                   onClick={(e) => handleZoomClick(e, image)}
+                  onKeyDown={(e) =>
+                    handleKeyDown(e, () => handleZoomClick(e, image))
+                  }
+                  aria-label={`Ampliar imagen ${image.id}`}
+                  tabIndex={0}
                 >
-                  <div className="bg-black bg-opacity-60 backdrop-blur-sm rounded-full p-2 hover:bg-opacity-80 transition-all duration-200 hover:scale-110">
-                    <ZoomIn
-                      className="text-white drop-shadow-lg"
-                      size={isMobile ? 20 : 24}
-                    />
-                  </div>
-                </div>
+                  <ZoomIn
+                    className="text-white drop-shadow-lg"
+                    size={isMobile ? 20 : 24}
+                  />
+                </button>
               )}
-            </div>
-          </div>
+            </span>
+          </button>
         ))}
-      </div>
+      </section>
 
       {selectedImage && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-sm"
+        <section
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
           onClick={closeModal}
+          onKeyDown={handleModalKeyDown}
+          tabIndex={-1}
         >
-          <div
-            className="relative animate-in zoom-in-95 duration-500 ease-out"
-            style={{
-              animation: "polaroidFloat 3s ease-in-out infinite",
-              transform: "rotate(-1deg)",
-            }}
+          <article
+            className="polaroid-wrapper"
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-20 h-12 bg-yellow-100 opacity-70 rounded-sm shadow-lg z-10"
-              style={{
-                transform: "translateX(-50%) rotate(2deg)",
-                background:
-                  "linear-gradient(45deg, #f4f1de 0%, #e8dcc0 50%, #f4f1de 100%)",
-                boxShadow:
-                  "0 2px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.3)",
-              }}
-            />
+            <div className="paper-clip" role="presentation" />
 
-            <div className="bg-white p-4 pb-16 shadow-2xl max-w-sm mx-4">
-              <img
-                src={selectedImage.src}
-                alt={selectedImage.alt}
-                className="w-full h-auto object-cover"
-                style={{ maxHeight: "400px", aspectRatio: "auto" }}
-              />
-              <div className="text-center mt-4 text-gray-600 font-handwriting">
-                Imagen {selectedImage.id}
+            <div className={`polaroid-container ${isFlipped ? "flipped" : ""}`}>
+              {/* Frente del polaroid */}
+              <div className="polaroid-front">
+                <div className="polaroid-content">
+                  <Image
+                    src={selectedImage.src}
+                    alt={selectedImage.alt}
+                    fill
+                    className="polaroid-image"
+                  />
+
+                  <div className="polaroid-footer">
+                    <h2 id="modal-title" className="image-title">
+                      <Heart className="text-pink-500" size={16} />
+                      <span>Imagen {selectedImage.id}</span>
+                    </h2>
+
+                    <button
+                      type="button"
+                      onClick={handleMessageClick}
+                      onKeyDown={(e) => handleKeyDown(e, handleMessageClick)}
+                      className="message-button"
+                      aria-label="Escribir mensaje para Nahiara"
+                      tabIndex={0}
+                    >
+                      <MessageCircle size={14} />
+                      Mensaje
+                    </button>
+                  </div>
+
+                  <div className="nahiara-messages">
+                    <p className="nahiara-text">💕 Mensajes para Nahiara 💕</p>
+                    <button
+                      type="button"
+                      onClick={handleViewMessages}
+                      onKeyDown={(e) => handleKeyDown(e, handleViewMessages)}
+                      className="view-messages-button"
+                      aria-label={`Ver mensajes de esta imagen. ${getMessagesText(
+                        selectedImage.id
+                      )}`}
+                      tabIndex={0}
+                    >
+                      {getMessagesText(selectedImage.id)}
+                    </button>
+                  </div>
+
+                  {showCommentForm && (
+                    <form
+                      className="form-overlay"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        submitComment();
+                      }}
+                    >
+                      <h3 className="form-title">
+                        <Heart size={18} />
+                        Escribe para Nahiara
+                      </h3>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "12px",
+                        }}
+                      >
+                        <label htmlFor="author-name" className="sr-only">
+                          Tu nombre
+                        </label>
+                        <input
+                          id="author-name"
+                          type="text"
+                          placeholder="Tu nombre"
+                          value={newComment.authorName}
+                          onChange={(e) =>
+                            setNewComment((prev) => ({
+                              ...prev,
+                              authorName: e.target.value,
+                            }))
+                          }
+                          className="form-field"
+                          maxLength={100}
+                          required
+                          aria-required="true"
+                        />
+                        <label htmlFor="message-text" className="sr-only">
+                          Tu mensaje para Nahiara
+                        </label>
+                        <textarea
+                          id="message-text"
+                          placeholder="Escribe tu mensaje para Nahiara..."
+                          value={newComment.commentText}
+                          onChange={(e) =>
+                            setNewComment((prev) => ({
+                              ...prev,
+                              commentText: e.target.value,
+                            }))
+                          }
+                          className="form-field form-textarea"
+                          maxLength={1000}
+                          required
+                          aria-required="true"
+                        />
+                        <div className="form-buttons">
+                          <button
+                            type="submit"
+                            disabled={submittingComment}
+                            className="submit-button"
+                            aria-label="Enviar mensaje para Nahiara"
+                          >
+                            {submittingComment ? (
+                              <span
+                                className="loading-spinner"
+                                aria-hidden="true"
+                              ></span>
+                            ) : (
+                              <Send size={16} />
+                            )}
+                            {submittingComment ? "Enviando..." : "Enviar 💕"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowCommentForm(false)}
+                            onKeyDown={(e) =>
+                              handleKeyDown(e, () => setShowCommentForm(false))
+                            }
+                            className="cancel-button"
+                            aria-label="Cancelar mensaje"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              </div>
+
+              {/* Reverso del polaroid */}
+              <div className="polaroid-back">
+                <div className="polaroid-back-content">
+                  <header className="back-header">
+                    <h3 className="back-title">
+                      <Heart size={18} />
+                      Para Nahiara
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setIsFlipped(false)}
+                      onKeyDown={(e) =>
+                        handleKeyDown(e, () => setIsFlipped(false))
+                      }
+                      className="flip-button"
+                      title="Voltear foto"
+                      aria-label="Voltear foto al frente"
+                      tabIndex={0}
+                    >
+                      <RotateCcw size={16} />
+                    </button>
+                  </header>
+
+                  <div
+                    className="messages-area"
+                    role="list"
+                    aria-label="Mensajes para Nahiara"
+                  >
+                    {loadingComments[selectedImage.id] ? (
+                      <div
+                        className="loading-messages"
+                        role="status"
+                        aria-live="polite"
+                      >
+                        <span
+                          className="loading-spinner"
+                          aria-hidden="true"
+                        ></span>
+                        <p className="loading-text">Cargando mensajes...</p>
+                      </div>
+                    ) : (
+                      <>
+                        {comments[selectedImage.id] &&
+                        comments[selectedImage.id].length > 0 ? (
+                          <div className="messages-container">
+                            {comments[selectedImage.id].map(
+                              (comment, index) => (
+                                <article
+                                  key={comment.id}
+                                  className="handwritten-message"
+                                  role="listitem"
+                                >
+                                  <blockquote
+                                    className={`message-text ${
+                                      index % 2 === 0
+                                        ? "rotate-left"
+                                        : "rotate-right"
+                                    }`}
+                                  >
+                                    {comment.comment_text}
+                                  </blockquote>
+
+                                  <footer className="message-signature-area">
+                                    <cite
+                                      className={`message-signature ${
+                                        index % 2 === 0
+                                          ? "signature-rotate-left"
+                                          : "signature-rotate-right"
+                                      }`}
+                                    >
+                                      - {comment.author_name}
+                                    </cite>
+
+                                    <time
+                                      className="message-date"
+                                      dateTime={comment.created_at}
+                                    >
+                                      {formatDate(comment.created_at)}
+                                    </time>
+                                  </footer>
+
+                                  {index <
+                                    comments[selectedImage.id].length - 1 && (
+                                    <hr className="message-separator" />
+                                  )}
+                                </article>
+                              )
+                            )}
+                          </div>
+                        ) : (
+                          <div className="empty-messages" role="status">
+                            <p className="empty-message-text">
+                              Aún no hay mensajes...
+                            </p>
+                            <p className="empty-subtext">
+                              ¡Sé el primero en escribirle algo lindo!
+                            </p>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
             <button
+              type="button"
               onClick={closeModal}
-              className="absolute -top-8 -left-8 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-all duration-200 shadow-lg hover:scale-110"
+              onKeyDown={(e) => handleKeyDown(e, closeModal)}
+              className="close-button"
+              aria-label="Cerrar ventana de imagen"
+              tabIndex={0}
             >
               <X size={20} />
             </button>
-          </div>
-        </div>
+          </article>
+        </section>
       )}
-
-      <style jsx>{`
-        @keyframes polaroidFloat {
-          0%,
-          100% {
-            transform: rotate(-1deg) translateY(0px);
-          }
-          50% {
-            transform: rotate(-0.5deg) translateY(-5px);
-          }
-        }
-        .font-handwriting {
-          font-family: "Kalam", "Comic Sans MS", cursive;
-          font-weight: 400;
-        }
-        @media (max-width: 480px) {
-          .masonry-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-        }
-        @media (min-width: 481px) and (max-width: 768px) {
-          .masonry-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-        }
-        @media (min-width: 769px) and (max-width: 1024px) {
-          .masonry-grid {
-            grid-template-columns: repeat(4, 1fr) !important;
-          }
-        }
-        @media (min-width: 1025px) {
-          .masonry-grid {
-            grid-template-columns: repeat(6, 1fr) !important;
-          }
-        }
-        @media (min-width: 1400px) {
-          .masonry-grid {
-            grid-template-columns: repeat(8, 1fr) !important;
-          }
-        }
-      `}</style>
-    </div>
+    </main>
   );
 };
 
