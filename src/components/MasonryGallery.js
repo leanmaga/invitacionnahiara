@@ -314,7 +314,6 @@ const MasonryGallery = () => {
                   <div className="polaroid-footer">
                     <h2 id="modal-title" className="image-title">
                       <Heart className="text-pink-500" size={16} />
-                      <span>Imagen {selectedImage.id}</span>
                     </h2>
 
                     <button
