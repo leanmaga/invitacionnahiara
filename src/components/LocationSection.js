@@ -1,7 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { MapPin, Navigation, Phone, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  MapPin,
+  Navigation,
+  Phone,
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 export default function LocationSection() {
   // Obtener datos de variables de entorno
@@ -21,6 +28,37 @@ export default function LocationSection() {
   const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(
     direccionCompleta
   )}`;
+
+  // Slider state
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const images = [
+    "/assets/salon.jpg",
+    "/assets/salon2.jpg",
+    "/assets/salon3.jpg",
+    "/assets/salon4.jpg",
+    "/assets/salon5.jpg",
+  ];
+
+  // Auto-slide functionality
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % images.length);
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(timer);
+  }, [images.length]);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % images.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
 
   // CSS para animaciones
   const styles = `
@@ -48,6 +86,9 @@ export default function LocationSection() {
     }
     .pulse-element {
       animation: pulse 2s infinite;
+    }
+    .slide-transition {
+      transition: transform 0.5s ease-in-out;
     }
 
     @keyframes fadeInUp {
@@ -147,51 +188,89 @@ export default function LocationSection() {
             </div>
           </div>
 
-          {/* Map Placeholder */}
+          {/* Image Slider */}
           <div className="relative fade-in-right">
-            <div className="aspect-square lg:aspect-[4/3] bg-gradient-to-br from-yellow-100 to-amber-100 rounded-3xl overflow-hidden shadow-xl">
-              {/* Map placeholder */}
-              <div className="w-full h-full flex items-center justify-center relative">
-                <div className="text-center">
-                  <MapPin className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
-                  <h3 className="font-serif text-2xl font-bold text-yellow-800 mb-2">
-                    {lugar}
-                  </h3>
-                  <p className="text-yellow-700 px-4">{direccion}</p>
-                  <p className="text-yellow-600 text-sm mt-2">
-                    Haz clic para ver el mapa interactivo
-                  </p>
+            <div className="aspect-square lg:aspect-[4/3] bg-gradient-to-br from-yellow-100 to-amber-100 rounded-3xl overflow-hidden shadow-xl relative">
+              {/* Image Container */}
+              <div className="relative w-full h-full overflow-hidden">
+                <div
+                  className="flex transition-transform duration-500 ease-in-out h-full slide-transition"
+                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                >
+                  {images.map((image, index) => (
+                    <div key={index} className="w-full h-full flex-shrink-0">
+                      <img
+                        src={image}
+                        alt={`Imagen del salón ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Navigation Arrows */}
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-300 hover:scale-110"
+                  aria-label="Imagen anterior"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-300 hover:scale-110"
+                  aria-label="Siguiente imagen"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+
+                {/* Dots Indicator */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                  {images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                        index === currentSlide
+                          ? "bg-white scale-125 shadow-lg"
+                          : "bg-white/60 hover:bg-white/80"
+                      }`}
+                      aria-label={`Ir a imagen ${index + 1}`}
+                    />
+                  ))}
+                </div>
+
+                {/* Image Counter */}
+                <div className="absolute top-4 right-4 bg-black/40 text-white px-3 py-1 rounded-full text-sm font-medium">
+                  {currentSlide + 1} / {images.length}
+                </div>
+
+                {/* Overlay with salon info */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                  <div className="text-white">
+                    <h3 className="font-serif text-xl font-bold mb-1">
+                      {lugar}
+                    </h3>
+                    <p className="text-sm opacity-90">
+                      Conoce nuestras instalaciones
+                    </p>
+                  </div>
                 </div>
 
                 {/* Decorative elements */}
-                <div className="absolute top-4 right-4">
-                  <div className="w-8 h-8 border-2 border-yellow-400 border-dashed rounded-full rotate-element"></div>
-                </div>
-
-                <div className="absolute bottom-4 left-4">
-                  <div className="w-4 h-4 bg-yellow-500 rounded-full pulse-element"></div>
-                </div>
-
                 <div className="absolute top-4 left-4">
-                  <div className="w-6 h-6 border-2 border-amber-400 rounded-full opacity-70"></div>
-                </div>
-
-                <div className="absolute bottom-4 right-4">
-                  <div className="w-3 h-3 bg-amber-400 rounded-full opacity-80"></div>
+                  <div className="w-8 h-8 border-2 border-white/40 border-dashed rounded-full rotate-element"></div>
                 </div>
               </div>
+            </div>
 
-              {/* Click overlay */}
-              <div
-                className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 transition-opacity cursor-pointer flex items-center justify-center"
-                onClick={() => window.open(googleMapsUrl, "_blank")}
-              >
-                <div className="bg-white/90 backdrop-blur-sm rounded-full px-6 py-3">
-                  <span className="font-semibold text-yellow-800">
-                    Ver Mapa Completo
-                  </span>
-                </div>
-              </div>
+            {/* Salon Description */}
+            <div className="mt-4 text-center">
+              <p className="text-yellow-700 text-sm">
+                Desliza para ver más imágenes del salón
+              </p>
             </div>
           </div>
         </div>
