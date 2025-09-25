@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Clock, Sparkles, Star, Crown, Heart } from "lucide-react";
 
@@ -20,15 +18,15 @@ export default function CountdownSection() {
     process.env.NEXT_PUBLIC_HORA_EVENTO || "10:00 AM - 19:00 PM";
   const nombre = process.env.NEXT_PUBLIC_NOMBRE_QUINCEANERA || "Nahiara";
 
-  // Generar partículas doradas
+  // Generar partículas doradas más sutiles
   useEffect(() => {
-    const newParticles = Array.from({ length: 20 }, (_, i) => ({
+    const newParticles = Array.from({ length: 10 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
       delay: Math.random() * 5,
-      duration: 4 + Math.random() * 3,
-      size: Math.random() * 3 + 1,
+      duration: 6 + Math.random() * 3,
+      size: Math.random() * 2 + 1,
     }));
     setParticles(newParticles);
   }, []);
@@ -37,7 +35,7 @@ export default function CountdownSection() {
     // Parsear la fecha del evento desde las variables de entorno
     const parseEventDate = () => {
       try {
-        // Remover el día de la semana si existe (ej: "Sábado 08 de Noviembre, 2025")
+        // Remover el día de la semana si existe
         let fechaLimpia = fechaEvento;
         const diasSemana = [
           "Lunes",
@@ -54,7 +52,7 @@ export default function CountdownSection() {
           }
         });
 
-        // Convertir fecha del formato "08 de Noviembre, 2025" a formato que Date pueda parsear
+        // Convertir fecha del formato español a inglés
         fechaLimpia = fechaLimpia
           .replace(" de ", " ")
           .replace("Enero", "January")
@@ -70,21 +68,13 @@ export default function CountdownSection() {
           .replace("Noviembre", "November")
           .replace("Diciembre", "December");
 
-        // Extraer la hora de inicio (ej: "10:00 AM" de "10:00 AM - 19:00 PM")
+        // Extraer la hora de inicio
         const horaInicio = horaEvento.split(" - ")[0];
-
-        // Combinar fecha y hora
         const fechaCompleta = `${fechaLimpia} ${horaInicio}`;
-
-        console.log("Fecha original:", fechaEvento);
-        console.log("Fecha limpia:", fechaLimpia);
-        console.log("Fecha completa:", fechaCompleta);
-        console.log("Fecha parseada:", new Date(fechaCompleta));
 
         return new Date(fechaCompleta).getTime();
       } catch (error) {
         console.error("Error parsing event date:", error);
-        // Fecha de fallback: 1 año desde hoy
         const fallback = new Date();
         fallback.setFullYear(fallback.getFullYear() + 1);
         return fallback.getTime();
@@ -109,18 +99,11 @@ export default function CountdownSection() {
 
         setTimeLeft(newTimeLeft);
 
-        // Crear efecto de pulso en cada cambio de segundo
         if (newTimeLeft.seconds !== timeLeft.seconds) {
           setPulseKey((prev) => prev + 1);
         }
       } else {
-        // Si el evento ya pasó, mostrar zeros
-        setTimeLeft({
-          days: 0,
-          hours: 0,
-          minutes: 0,
-          seconds: 0,
-        });
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
     }, 1000);
 
@@ -132,25 +115,25 @@ export default function CountdownSection() {
       label: "Días",
       value: timeLeft.days,
       icon: Crown,
-      color: "from-yellow-400 to-amber-500",
+      color: "from-amber-400 to-yellow-500",
     },
     {
       label: "Horas",
       value: timeLeft.hours,
       icon: Clock,
-      color: "from-amber-400 to-yellow-500",
+      color: "from-yellow-400 to-amber-500",
     },
     {
       label: "Minutos",
       value: timeLeft.minutes,
       icon: Sparkles,
-      color: "from-yellow-500 to-amber-400",
+      color: "from-amber-500 to-yellow-400",
     },
     {
       label: "Segundos",
       value: timeLeft.seconds,
       icon: Heart,
-      color: "from-amber-500 to-yellow-400",
+      color: "from-yellow-500 to-amber-400",
     },
   ];
 
@@ -160,207 +143,104 @@ export default function CountdownSection() {
     timeLeft.minutes === 0 &&
     timeLeft.seconds === 0;
 
-  const styles = `
-    @keyframes floatGolden {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      25% { transform: translateY(-15px) rotate(90deg); }
-      50% { transform: translateY(-30px) rotate(180deg); }
-      75% { transform: translateY(-15px) rotate(270deg); }
-    }
-
-    @keyframes sparkleGlow {
-      0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
-      50% { opacity: 1; transform: scale(1) rotate(180deg); }
-    }
-
-    @keyframes shimmerGold {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-
-    @keyframes pulseNumber {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    @keyframes glowRing {
-      0%, 100% { 
-        box-shadow: 0 0 20px rgba(251, 191, 36, 0.3), 
-                    0 0 40px rgba(251, 191, 36, 0.2),
-                    inset 0 0 20px rgba(251, 191, 36, 0.1);
-      }
-      50% { 
-        box-shadow: 0 0 40px rgba(251, 191, 36, 0.6), 
-                    0 0 80px rgba(251, 191, 36, 0.4),
-                    inset 0 0 30px rgba(251, 191, 36, 0.2);
-      }
-    }
-
-    @keyframes slideInUp {
-      from { opacity: 0; transform: translateY(50px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes slideInScale {
-      from { opacity: 0; transform: scale(0.5) translateY(30px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .particle-golden {
-      animation: floatGolden var(--duration) ease-in-out infinite;
-      animation-delay: var(--delay);
-    }
-
-    .sparkle-glow {
-      animation: sparkleGlow 3s ease-in-out infinite;
-      animation-delay: var(--delay);
-    }
-
-    .shimmer-text {
-      background: linear-gradient(90deg, #d97706 0%, #f59e0b 25%, #fbbf24 50%, #f59e0b 75%, #d97706 100%);
-      background-size: 200% 100%;
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: shimmerGold 3s ease-in-out infinite;
-    }
-
-    .glass-golden {
-      background: rgba(254, 243, 199, 0.15);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      border: 2px solid rgba(251, 191, 36, 0.3);
-    }
-
-    .number-pulse {
-      animation: pulseNumber 0.6s ease-in-out;
-    }
-
-    .glow-ring {
-      animation: glowRing 2s ease-in-out infinite;
-    }
-
-    .slide-in-up {
-      animation: slideInUp 0.8s ease-out forwards;
-    }
-
-    .slide-in-scale {
-      animation: slideInScale 0.6s ease-out forwards;
-    }
-
-    .hover-lift {
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .hover-lift:hover {
-      transform: translateY(-15px) scale(1.05);
-      filter: brightness(1.1);
-    }
-  `;
-
   return (
-    <section className="relative py-24 min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-yellow-100 overflow-hidden flex items-center">
-      <style>{styles}</style>
-
-      {/* Partículas flotantes doradas */}
+    <section className="relative py-10 bg-gradient-to-br from-amber-50/30 via-white to-yellow-50/40 overflow-hidden">
+      {/* Partículas flotantes sutiles */}
       <div className="absolute inset-0 pointer-events-none">
         {particles.map((particle) => (
           <div
             key={particle.id}
-            className="absolute particle-golden"
+            className="absolute animate-pulse"
             style={{
               left: `${particle.x}%`,
               top: `${particle.y}%`,
-              "--delay": `${particle.delay}s`,
-              "--duration": `${particle.duration}s`,
+              animationDelay: `${particle.delay}s`,
               width: `${particle.size}px`,
               height: `${particle.size}px`,
             }}
           >
-            <Star className="w-full h-full text-yellow-400/60" />
+            <Star className="w-full h-full text-amber-300/40" />
           </div>
         ))}
       </div>
 
-      {/* Sparkles decorativos grandes */}
+      {/* Sparkles decorativos */}
       <div className="absolute inset-0 pointer-events-none">
-        {Array.from({ length: 12 }).map((_, i) => (
+        {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="absolute sparkle-glow"
+            className="absolute animate-pulse"
             style={{
-              left: `${10 + i * 8}%`,
-              top: `${15 + (i % 4) * 20}%`,
-              "--delay": `${i * 0.4}s`,
+              left: `${15 + i * 12}%`,
+              top: `${20 + (i % 3) * 25}%`,
+              animationDelay: `${i * 0.8}s`,
             }}
           >
-            <Sparkles className="w-6 h-6 text-yellow-400/50" />
+            <Sparkles className="w-3 h-3 text-amber-400/40" />
           </div>
         ))}
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
-        {/* Header Espectacular */}
-        <div className="mb-16 slide-in-up">
-          <div className="relative inline-block mb-8">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/30 to-amber-400/30 blur-3xl glow-ring"></div>
-            <Clock className="relative w-20 h-20 mx-auto text-yellow-600" />
+      <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+        {/* Header delicado */}
+        <div className="mb-8">
+          <div className="relative inline-block mb-3">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-200/30 to-yellow-200/30 blur-lg rounded-full"></div>
+            <Clock className="relative w-6 h-6 mx-auto text-amber-600" />
           </div>
 
-          <h2 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight shimmer-text">
+          <h2 className="font-serif text-xl md:text-2xl font-semibold mb-2 bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent">
             {eventPassed
               ? `¡El Evento de ${nombre} ya Pasó!`
               : "Cuenta Regresiva"}
           </h2>
 
-          <p className="text-2xl md:text-3xl text-yellow-800 font-medium max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm md:text-base text-amber-800 font-medium max-w-2xl mx-auto">
             {eventPassed
               ? "Esperamos que hayas disfrutado de esta celebración mágica"
               : `¡La fiesta de ${nombre} está por comenzar!`}
           </p>
+
+          <div className="w-16 h-px bg-gradient-to-r from-amber-400 to-yellow-400 mx-auto rounded-full mt-2"></div>
         </div>
 
-        {/* Countdown Cards */}
+        {/* Countdown Cards - compactas */}
         {!eventPassed && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto mb-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-2xl mx-auto mb-8">
             {timeUnits.map((unit, index) => {
               const IconComponent = unit.icon;
               return (
                 <div
                   key={unit.label}
-                  className="slide-in-scale hover-lift glass-golden rounded-3xl p-6 md:p-8 shadow-2xl glow-ring"
-                  style={{ animationDelay: `${index * 0.2}s` }}
+                  className="bg-white/80 backdrop-blur-sm border border-amber-200/50 rounded-xl p-3 md:p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
                 >
-                  {/* Icono decorativo */}
-                  <div className="mb-4">
+                  {/* Icono pequeño */}
+                  <div className="mb-2">
                     <div
-                      className={`w-12 h-12 mx-auto rounded-2xl bg-gradient-to-r ${unit.color} flex items-center justify-center`}
+                      className={`w-6 h-6 mx-auto rounded-lg bg-gradient-to-r ${unit.color} flex items-center justify-center`}
                     >
-                      <IconComponent className="w-6 h-6 text-white" />
+                      <IconComponent className="w-3 h-3 text-white" />
                     </div>
                   </div>
 
-                  {/* Número con efecto especial */}
+                  {/* Número */}
                   <div
                     key={`${unit.label}-${unit.value}-${pulseKey}`}
-                    className="text-5xl md:text-6xl lg:text-7xl font-bold text-yellow-800 mb-3 number-pulse"
-                    style={{
-                      textShadow: "0 4px 20px rgba(217, 119, 6, 0.3)",
-                    }}
+                    className="text-lg md:text-xl font-bold text-amber-800 mb-1 transition-transform duration-300"
+                    style={{ textShadow: "0 2px 8px rgba(217, 119, 6, 0.2)" }}
                   >
                     {unit.value.toString().padStart(2, "0")}
                   </div>
 
                   {/* Label */}
-                  <div className="text-lg md:text-xl font-bold text-yellow-700 uppercase tracking-wider">
+                  <div className="text-xs md:text-sm font-medium text-amber-700 uppercase tracking-wide">
                     {unit.label}
                   </div>
 
-                  {/* Decoración inferior */}
-                  <div className="mt-4 flex justify-center">
+                  {/* Línea decorativa */}
+                  <div className="mt-2 flex justify-center">
                     <div
-                      className={`h-1 w-16 bg-gradient-to-r ${unit.color} rounded-full`}
+                      className={`h-0.5 w-6 bg-gradient-to-r ${unit.color} rounded-full`}
                     ></div>
                   </div>
                 </div>
@@ -369,34 +249,29 @@ export default function CountdownSection() {
           </div>
         )}
 
-        {/* Mensaje inspiracional */}
-        <div className="slide-in-up" style={{ animationDelay: "0.8s" }}>
-          <div className="glass-golden rounded-3xl p-8 md:p-10 max-w-4xl mx-auto shadow-2xl mb-12">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <Heart className="w-8 h-8 text-yellow-600" />
-              <Crown className="w-10 h-10 text-yellow-500" />
-              <Heart className="w-8 h-8 text-yellow-600" />
-            </div>
-
-            <p className="text-xl md:text-2xl text-yellow-800 font-medium leading-relaxed">
-              {eventPassed
-                ? `Gracias por ser parte de la celebración de ${nombre}. Los recuerdos durarán para siempre.`
-                : "Cada momento cuenta cuando se trata de crear recuerdos mágicos que durarán toda la vida"}
-            </p>
+        {/* Mensaje inspiracional delicado */}
+        <div className="bg-white/70 backdrop-blur-sm border border-amber-200/50 rounded-xl p-4 md:p-6 max-w-2xl mx-auto shadow-sm">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <Heart className="w-4 h-4 text-amber-500" />
+            <Crown className="w-5 h-5 text-amber-600" />
+            <Heart className="w-4 h-4 text-amber-500" />
           </div>
 
-          {/* Información del evento con estilo */}
-          <div className="space-y-4">
-            {/* Sparkles finales */}
-            <div className="flex justify-center gap-3 mt-8">
-              {Array.from({ length: 7 }).map((_, i) => (
-                <Star
-                  key={i}
-                  className="w-4 h-4 text-yellow-500 sparkle-glow"
-                  style={{ "--delay": `${i * 0.3}s` }}
-                />
-              ))}
-            </div>
+          <p className="text-sm md:text-base text-amber-800 font-medium leading-relaxed">
+            {eventPassed
+              ? `Gracias por ser parte de la celebración de ${nombre}. Los recuerdos durarán para siempre.`
+              : "Cada momento cuenta cuando se trata de crear recuerdos mágicos que durarán toda la vida"}
+          </p>
+
+          {/* Decoración final */}
+          <div className="flex justify-center gap-1 mt-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-1 h-1 bg-amber-400 rounded-full animate-pulse"
+                style={{ animationDelay: `${i * 0.2}s` }}
+              ></div>
+            ))}
           </div>
         </div>
       </div>

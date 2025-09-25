@@ -498,21 +498,21 @@ export default function RSVPSection() {
                     <div className="absolute inset-0 pulse-glow">
                       <div className="w-24 h-24 bg-gradient-to-br from-yellow-400/50 to-amber-500/50 rounded-full blur-2xl"></div>
                     </div>
-                    <Send className="relative w-12 h-12 text-yellow-100 drop-shadow-lg" />
+                    <Send className="relative w-6 h-6 text-yellow-100 drop-shadow-lg" />
                     <div className="absolute -top-2 -right-2 rotate-sparkles">
                       <Sparkles className="w-6 h-6 text-yellow-300" />
                     </div>
                   </div>
 
                   <h2
-                    className="font-bold text-4xl sm:text-5xl mb-6 leading-tight text-yellow-100"
+                    className="font-bold text-2xl md:text-3xl lg:text-4xl mb-4 leading-tight text-yellow-800"
                     style={{
-                      textShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
+                      textShadow: "0 4px 20px rgba(217, 119, 6, 0.3)",
                     }}
                   >
                     Confirma tu
                     <br />
-                    <span className="text-3xl sm:text-4xl">Asistencia</span>
+                    Asistencia
                   </h2>
 
                   <p className="text-lg text-yellow-100/90 mb-12 font-medium drop-shadow-lg">
@@ -713,7 +713,7 @@ export default function RSVPSection() {
                     </div>
 
                     <h2
-                      className="font-bold text-4xl md:text-5xl lg:text-6xl mb-4 leading-tight text-yellow-800"
+                      className="font-bold text-2xl md:text-3xl lg:text-4xl mb-4 leading-tight text-yellow-800"
                       style={{
                         textShadow: "0 4px 20px rgba(217, 119, 6, 0.3)",
                       }}

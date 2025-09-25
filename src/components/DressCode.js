@@ -230,7 +230,7 @@ export default function DressCodeSection() {
                     onClick={() => setActiveCategory(key)}
                     className={`relative px-6 py-3 rounded-full font-semibold transition-all duration-500 flex items-center gap-3 ${
                       activeCategory === key
-                        ? `bg-gradient-to-r ${category.color} text-white shadow-xl scale-110`
+                        ? `bg-gradient-to-r ${category.color} text-yellow-800 shadow-xl scale-110`
                         : "text-yellow-700 hover:bg-yellow-100/50"
                     }`}
                   >

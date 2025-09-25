@@ -44,7 +44,30 @@ const MasonryGallery = () => {
 
   useEffect(() => {
     updateImageCount(51);
+    // Cargar conteos de comentarios para todas las imágenes
+    loadAllCommentCounts();
   }, [updateImageCount]);
+
+  // Función para cargar el conteo de comentarios de todas las imágenes
+  const loadAllCommentCounts = async () => {
+    try {
+      const promises = images.map(async (image) => {
+        const response = await fetch(`/api/image-comments?imageId=${image.id}`);
+        const data = await response.json();
+        return { imageId: image.id, comments: data.comments || [] };
+      });
+
+      const results = await Promise.all(promises);
+      const commentsMap = {};
+      results.forEach((result) => {
+        commentsMap[result.imageId] = result.comments;
+      });
+
+      setComments(commentsMap);
+    } catch (error) {
+      console.error("Error loading comment counts:", error);
+    }
+  };
 
   const images = Array.from({ length: 51 }, (_, i) => ({
     id: i + 1,
@@ -261,6 +284,14 @@ const MasonryGallery = () => {
             />
 
             <div className="image-overlay">
+              {/* Contador de comentarios si existen */}
+              {comments[image.id] && comments[image.id].length > 0 && (
+                <div className="message-counter">
+                  <MessageCircle size={12} />
+                  <span>{comments[image.id].length}</span>
+                </div>
+              )}
+
               {(isImageIlluminated(image.id) ||
                 (!isMobile && hoveredImage === image.id)) && (
                 <button
@@ -313,6 +344,7 @@ const MasonryGallery = () => {
                   <div className="polaroid-footer">
                     <h2 id="modal-title" className="image-title">
                       <Heart className="text-pink-500" size={16} />
+                      <span>Imagen {selectedImage.id}</span>
                     </h2>
 
                     <button
