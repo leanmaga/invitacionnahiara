@@ -23,8 +23,6 @@ export function useQuinceaneraConfig() {
 
     // Redes sociales
     instagramUser: process.env.NEXT_PUBLIC_INSTAGRAM_USER || "isabella_quince",
-    facebookPage:
-      process.env.NEXT_PUBLIC_FACEBOOK_PAGE || "Isabella Quinceañera",
 
     // Fechas límite
     fechaLimiteRSVP:

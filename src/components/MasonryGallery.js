@@ -36,14 +36,14 @@ const MasonryGallery = () => {
 
   useEffect(() => {
     const heights = {};
-    for (let i = 1; i <= 51; i++) {
+    for (let i = 2; i <= 55; i++) {
       heights[i] = Math.floor(Math.random() * 3) + 1;
     }
     setImageHeights(heights);
   }, []);
 
   useEffect(() => {
-    updateImageCount(51);
+    updateImageCount(55);
     // Cargar conteos de comentarios para todas las imágenes
     loadAllCommentCounts();
   }, [updateImageCount]);
@@ -69,7 +69,7 @@ const MasonryGallery = () => {
     }
   };
 
-  const images = Array.from({ length: 51 }, (_, i) => ({
+  const images = Array.from({ length: 55 }, (_, i) => ({
     id: i + 1,
     src: `/assets/${i + 1}.jpg`,
     alt: `Image ${i + 1}`,
@@ -344,7 +344,6 @@ const MasonryGallery = () => {
                   <div className="polaroid-footer">
                     <h2 id="modal-title" className="image-title">
                       <Heart className="text-pink-500" size={16} />
-                      <span>Imagen {selectedImage.id}</span>
                     </h2>
 
                     <button
@@ -582,7 +581,7 @@ const MasonryGallery = () => {
               aria-label="Cerrar ventana de imagen"
               tabIndex={0}
             >
-              <X size={20} />
+              <X size={isMobile ? 24 : 20} />
             </button>
           </div>
         </div>

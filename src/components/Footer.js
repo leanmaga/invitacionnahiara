@@ -8,7 +8,6 @@ import {
   Phone,
   MessageCircle,
   Instagram,
-  Facebook,
   Star,
   Gem,
 } from "lucide-react";
@@ -30,10 +29,8 @@ export default function Footer() {
   const direccion =
     process.env.NEXT_PUBLIC_DIRECCION_EVENTO ||
     "Victoria 2051, B1716 Libertad, Merlo";
-  const instagramUser =
-    process.env.NEXT_PUBLIC_INSTAGRAM_USER || "nahiara_15años";
-  const facebookPage =
-    process.env.NEXT_PUBLIC_FACEBOOK_PAGE || "Nahiara Quinceañera";
+  const instagramUser = process.env.NEXT_PUBLIC_INSTAGRAM_USER || "nahi.gaa";
+
   const nombreFamilia =
     process.env.NEXT_PUBLIC_NOMBRE_FAMILIA || "Familia Garbán";
 
@@ -294,17 +291,6 @@ export default function Footer() {
                     className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center hover:shadow-xl transition-all duration-300 hover-lift"
                   >
                     <Instagram className="w-6 h-6" />
-                  </a>
-                )}
-
-                {facebookPage && (
-                  <a
-                    href={`https://facebook.com/${facebookPage}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl flex items-center justify-center hover:shadow-xl transition-all duration-300 hover-lift"
-                  >
-                    <Facebook className="w-6 h-6" />
                   </a>
                 )}
               </div>

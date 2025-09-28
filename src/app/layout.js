@@ -46,7 +46,7 @@ export const metadata = {
     siteName: `15 de ${nombreQuinceanera}`,
     images: [
       {
-        url: "/favicon.ico", // Relativo a metadataBase
+        url: "/favicon_io/favicon.ico", // Relativo a metadataBase
         width: 32,
         height: 32,
         alt: `${nombreQuinceanera} - Mis 15 Años`,
@@ -61,7 +61,7 @@ export const metadata = {
     card: "summary",
     title: `${nombreQuinceanera} - Mis 15 Años`,
     description: "Una celebración única",
-    images: ["/favicon.ico"], // Relativo a metadataBase
+    images: ["/favicon_io/favicon.ico"], // Relativo a metadataBase
   },
 
   // Meta tags adicionales
@@ -73,17 +73,29 @@ export const metadata = {
   // Favicons y iconos
   icons: {
     icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon_io/favicon.ico" },
+      {
+        url: "/favicon_io/favicon-16x16.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: "/favicon_io/favicon-32x32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
     ],
     apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      {
+        url: "/favicon_io/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
     ],
   },
 
   // Manifest
-  manifest: "/site.webmanifest",
+  manifest: "/favicon_io/site.webmanifest",
 };
 
 export default function RootLayout({ children }) {
@@ -110,7 +122,7 @@ export default function RootLayout({ children }) {
         />
 
         {/* Preload de recursos importantes */}
-        <link rel="preload" href="/favicon.ico" as="image" />
+        <link rel="preload" href="/favicon_io/favicon.ico" as="image" />
       </head>
       <body className={inter.className}>{children}</body>
     </html>
