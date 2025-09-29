@@ -31,17 +31,39 @@ const MusicPlayer = ({ className = "", showVolumeControl = true }) => {
   return (
     <div className={`inline-flex items-center gap-2 ${className}`}>
       {/* Botón principal de Play/Pause */}
+
       <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
         onClick={togglePlayPause}
         disabled={isLoading}
-        className={`flex items-center gap-1 px-3 py-1.5 text-yellow-900 text-xs font-medium rounded-full transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed relative overflow-hidden ${
+        animate={
+          !isPlaying && !isLoading
+            ? {
+                scale: [1, 1.08, 1],
+                boxShadow: [
+                  "0 4px 20px rgba(251, 191, 36, 0.5)",
+                  "0 6px 30px rgba(251, 191, 36, 0.8)",
+                  "0 4px 20px rgba(251, 191, 36, 0.5)",
+                ],
+              }
+            : {}
+        }
+        transition={
+          !isPlaying && !isLoading
+            ? {
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }
+            : {}
+        }
+        className={`flex items-center gap-1 px-3 py-1.5 text-yellow-900 text-sm font-bold rounded-full transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed relative overflow-hidden ${
           isPlaying
-            ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 bg-[length:200%_100%] animate-pulse shadow-lg shadow-yellow-300/50"
+            ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 bg-[length:200%_100%] shadow-lg shadow-yellow-300/50"
             : isLoading
             ? "bg-yellow-400"
-            : "bg-yellow-500 hover:bg-yellow-600 hover:shadow-lg hover:shadow-yellow-300/30"
+            : "bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-400 shadow-xl"
         }`}
         aria-label={isPlaying ? "Pausar música" : "Reproducir música"}
       >
