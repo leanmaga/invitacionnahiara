@@ -453,6 +453,17 @@ const MasonryGallery = () => {
                       </div>
                     </div>
                   )}
+
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    onKeyDown={(e) => handleKeyDown(e, closeModal)}
+                    className="close-button"
+                    aria-label="Cerrar ventana de imagen"
+                    tabIndex={0}
+                  >
+                    <X size={isMobile ? 24 : 20} />
+                  </button>
                 </div>
               </div>
 
