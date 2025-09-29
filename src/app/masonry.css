@@ -590,16 +590,16 @@
 
 /* Botón de cerrar */
 .close-button {
-  position: fixed;
-  top: 20px;
-  left: 20px;
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
   background-color: rgb(239, 68, 68);
   color: white;
   padding: 6px;
   border-radius: 50%;
   transition: all 0.2s;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  z-index: 100;
+  z-index: 20;
   border: none;
   cursor: pointer;
   display: inline-flex;
@@ -641,15 +641,6 @@
 
   .polaroid-image {
     max-height: 300px;
-  }
-
-  /* Botón de cerrar más grande en móvil */
-  .close-button {
-    top: 16px;
-    left: 16px;
-    width: 56px;
-    height: 56px;
-    padding: 16px;
   }
 
   .close-button svg {

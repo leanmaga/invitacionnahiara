@@ -44,11 +44,9 @@ const MasonryGallery = () => {
 
   useEffect(() => {
     updateImageCount(54);
-    // Cargar conteos de comentarios para todas las imágenes
     loadAllCommentCounts();
   }, [updateImageCount]);
 
-  // Función para cargar el conteo de comentarios de todas las imágenes
   const loadAllCommentCounts = async () => {
     try {
       const promises = images.map(async (image) => {
@@ -75,7 +73,6 @@ const MasonryGallery = () => {
     alt: `Image ${i + 1}`,
   }));
 
-  // Función para cargar comentarios de una imagen
   const loadComments = async (imageId) => {
     if (comments[imageId]) return;
 
@@ -100,7 +97,6 @@ const MasonryGallery = () => {
     }
   };
 
-  // Función para enviar un nuevo comentario
   const submitComment = async () => {
     if (!newComment.authorName.trim() || !newComment.commentText.trim()) {
       alert("Por favor completa todos los campos");
@@ -284,7 +280,6 @@ const MasonryGallery = () => {
             />
 
             <div className="image-overlay">
-              {/* Contador de comentarios si existen */}
               {comments[image.id] && comments[image.id].length > 0 && (
                 <div className="message-counter">
                   <MessageCircle size={12} />
@@ -332,7 +327,6 @@ const MasonryGallery = () => {
             <div className="paper-clip" role="presentation" />
 
             <div className={`polaroid-container ${isFlipped ? "flipped" : ""}`}>
-              {/* Frente del polaroid */}
               <div className="polaroid-front">
                 <div className="polaroid-content">
                   <img
@@ -376,13 +370,7 @@ const MasonryGallery = () => {
                   </div>
 
                   {showCommentForm && (
-                    <form
-                      className="form-overlay"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        submitComment();
-                      }}
-                    >
+                    <div className="form-overlay">
                       <h3 className="form-title">
                         <Heart size={18} />
                         Escribe para Nahiara
@@ -434,7 +422,8 @@ const MasonryGallery = () => {
                         />
                         <div className="form-buttons">
                           <button
-                            type="submit"
+                            type="button"
+                            onClick={submitComment}
                             disabled={submittingComment}
                             className="submit-button"
                             aria-label="Enviar mensaje para Nahiara"
@@ -462,12 +451,11 @@ const MasonryGallery = () => {
                           </button>
                         </div>
                       </div>
-                    </form>
+                    </div>
                   )}
                 </div>
               </div>
 
-              {/* Reverso del polaroid */}
               <div className="polaroid-back">
                 <div className="polaroid-back-content">
                   <div className="back-header">
@@ -569,20 +557,20 @@ const MasonryGallery = () => {
                       </>
                     )}
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    onKeyDown={(e) => handleKeyDown(e, closeModal)}
+                    className="close-button"
+                    aria-label="Cerrar ventana de imagen"
+                    tabIndex={0}
+                  >
+                    <X size={isMobile ? 24 : 20} />
+                  </button>
                 </div>
               </div>
             </div>
-
-            <button
-              type="button"
-              onClick={closeModal}
-              onKeyDown={(e) => handleKeyDown(e, closeModal)}
-              className="close-button"
-              aria-label="Cerrar ventana de imagen"
-              tabIndex={0}
-            >
-              <X size={isMobile ? 24 : 20} />
-            </button>
           </div>
         </div>
       )}
