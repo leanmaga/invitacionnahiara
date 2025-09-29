@@ -36,14 +36,14 @@ const MasonryGallery = () => {
 
   useEffect(() => {
     const heights = {};
-    for (let i = 2; i <= 55; i++) {
+    for (let i = 1; i <= 54; i++) {
       heights[i] = Math.floor(Math.random() * 3) + 1;
     }
     setImageHeights(heights);
   }, []);
 
   useEffect(() => {
-    updateImageCount(55);
+    updateImageCount(54);
     // Cargar conteos de comentarios para todas las imágenes
     loadAllCommentCounts();
   }, [updateImageCount]);
@@ -69,7 +69,7 @@ const MasonryGallery = () => {
     }
   };
 
-  const images = Array.from({ length: 55 }, (_, i) => ({
+  const images = Array.from({ length: 54 }, (_, i) => ({
     id: i + 1,
     src: `/assets/${i + 1}.jpg`,
     alt: `Image ${i + 1}`,

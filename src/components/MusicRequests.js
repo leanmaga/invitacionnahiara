@@ -283,7 +283,7 @@ export default function MusicRequests() {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-900/20 via-amber-800/30 to-yellow-700/40"></div>
 
-                <div className="relative z-10 text-center max-w-lg mx-auto px-6">
+                <div className="relative flex flex-col items-center z-10 text-center max-w-lg mx-auto px-6">
                   <div className="relative inline-flex items-center justify-center mb-8">
                     <div className="absolute inset-0">
                       <div className="w-24 h-24 bg-gradient-to-br from-yellow-400/50 to-amber-500/50 rounded-full blur-2xl animate-pulse"></div>

@@ -18,7 +18,6 @@ export default function Footer() {
 
   // Configuración desde variables de entorno
   const nombre = process.env.NEXT_PUBLIC_NOMBRE_QUINCEANERA || "Nahiara";
-  const telefono = process.env.NEXT_PUBLIC_TELEFONO || "+54 11 2776-4823";
   const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+541155299849";
   const fechaEvento =
     process.env.NEXT_PUBLIC_FECHA_EVENTO || "Sábado 08 de Noviembre, 2025";
@@ -179,7 +178,7 @@ export default function Footer() {
               height: `${particle.size}px`,
             }}
           >
-            <Star className="w-full h-full text-yellow-400/30" />
+            <Star className="w-full h-full text-white" />
           </div>
         ))}
       </div>
@@ -226,13 +225,6 @@ export default function Footer() {
                 <p className="font-semibold text-lg text-yellow-200">
                   {nombreFamilia}
                 </p>
-
-                {telefono && (
-                  <div className="flex items-center gap-3 justify-center">
-                    <Phone className="w-4 h-4 text-yellow-400" />
-                    <span className="font-medium">{telefono}</span>
-                  </div>
-                )}
 
                 {whatsapp && (
                   <a

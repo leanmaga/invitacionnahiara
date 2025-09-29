@@ -314,7 +314,7 @@ export default function RSVPSection() {
           >
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/90 via-amber-50/85 to-yellow-100/80"></div>
 
-            <div className="relative z-10 text-center max-w-lg mx-auto px-6 fade-in-up">
+            <div className="relative   z-10 text-center max-w-lg mx-auto px-6 fade-in-up">
               <div className="flex justify-center mb-8">
                 <div className="bounce-icon">
                   {isExisting ? (
@@ -493,14 +493,10 @@ export default function RSVPSection() {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-900/20 via-amber-800/30 to-yellow-700/40"></div>
 
-                <div className="relative z-10 text-center max-w-lg mx-auto px-6 fade-in-up">
+                <div className="relative flex flex-col items-center z-10 text-center max-w-lg mx-auto px-6 fade-in-up">
                   <div className="relative inline-flex items-center justify-center mb-8">
                     <div className="absolute inset-0 pulse-glow">
                       <div className="w-24 h-24 bg-gradient-to-br from-yellow-400/50 to-amber-500/50 rounded-full blur-2xl"></div>
-                    </div>
-                    <Send className="relative w-6 h-6 text-yellow-100 drop-shadow-lg" />
-                    <div className="absolute -top-2 -right-2 rotate-sparkles">
-                      <Sparkles className="w-6 h-6 text-yellow-300" />
                     </div>
                   </div>
 
@@ -510,13 +506,13 @@ export default function RSVPSection() {
                       textShadow: "0 4px 20px rgba(217, 119, 6, 0.3)",
                     }}
                   >
-                    Confirma tu
+                    Confirmá tu
                     <br />
                     Asistencia
                   </h2>
 
                   <p className="text-lg text-yellow-100/90 mb-12 font-medium drop-shadow-lg">
-                    Confirma antes del{" "}
+                    antes del{" "}
                     <span className="font-bold text-yellow-200">
                       {fechaLimiteRSVP.split(",")[0]}
                     </span>
@@ -706,10 +702,6 @@ export default function RSVPSection() {
                       <div className="absolute inset-0 pulse-glow">
                         <div className="w-20 h-20 bg-gradient-to-br from-yellow-400/50 to-amber-500/50 rounded-full blur-2xl"></div>
                       </div>
-                      <Send className="relative w-16 h-16 text-yellow-800 drop-shadow-lg" />
-                      <div className="absolute -top-2 -right-2 rotate-sparkles">
-                        <Sparkles className="w-6 h-6 text-yellow-600" />
-                      </div>
                     </div>
 
                     <h2
@@ -718,13 +710,13 @@ export default function RSVPSection() {
                         textShadow: "0 4px 20px rgba(217, 119, 6, 0.3)",
                       }}
                     >
-                      Confirma tu
+                      Confirmá tu
                       <br />
                       Asistencia
                     </h2>
 
                     <p className="text-lg text-yellow-900/80 max-w-lg mx-auto mb-6 font-medium">
-                      Confirma antes del{" "}
+                      antes del{" "}
                       <span className="font-bold text-yellow-700">
                         {fechaLimiteRSVP.split(",")[0]}
                       </span>{" "}

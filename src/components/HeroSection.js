@@ -274,7 +274,7 @@ export default function HeroSection() {
               ease: "easeInOut",
             }}
           >
-            Una celebración que no puedes perderte
+            Vení a celebrar conmigo un día mágico
           </motion.p>
         </motion.div>
       </div>

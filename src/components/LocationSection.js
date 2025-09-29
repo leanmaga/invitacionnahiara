@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function LocationSection() {
   // Obtener datos de variables de entorno
@@ -169,20 +170,33 @@ export default function LocationSection() {
                 </div>
               </div>
 
-              <div className="mt-8 flex flex-col sm:flex-row gap-4">
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 w-full">
                 <button
-                  className="flex-1 bg-gradient-to-r from-yellow-500 to-yellow-600 text-yellow-900 px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                  className="btn-large flex-1 bg-gradient-to-r from-red-600 to-red-700 font-semibold text-yellow-800 px-6 py-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:from-red-700 hover:to-red-800 flex items-center justify-center gap-3 border-2 border-red-800"
                   onClick={() => window.open(googleMapsUrl, "_blank")}
                 >
-                  <Navigation className="w-5 h-5 inline mr-2" />
-                  Ver en Google Maps
+                  <Image
+                    src="/assets/gmaps.png"
+                    alt="Google Maps"
+                    width={24}
+                    height={24}
+                    className="w-6 h-6"
+                  />
+                  Google Maps
                 </button>
 
                 <button
-                  className="flex-1 border-2 border-yellow-500 text-yellow-700 px-6 py-3 rounded-full font-semibold hover:bg-yellow-100/50 transition-all duration-300 hover:scale-105"
+                  className="btn-large flex-1 bg-gradient-to-r from-blue-500 to-blue-600 font-semibold text-yellow-800 px-6 py-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:from-blue-600 hover:to-blue-700 flex items-center justify-center gap-3 border-2 border-blue-700"
                   onClick={() => window.open(wazeUrl, "_blank")}
                 >
-                  Abrir en Waze
+                  <Image
+                    src="/assets/waze.png"
+                    alt="Waze"
+                    width={24}
+                    height={24}
+                    className="w-6 h-6"
+                  />
+                  Waze
                 </button>
               </div>
             </div>
@@ -198,10 +212,14 @@ export default function LocationSection() {
                   style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
                   {images.map((image, index) => (
-                    <div key={index} className="w-full h-full flex-shrink-0">
-                      <img
+                    <div
+                      key={index}
+                      className="relative w-full h-full flex-shrink-0"
+                    >
+                      <Image
                         src={image}
                         alt={`Imagen del salón ${index + 1}`}
+                        fill
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
@@ -265,26 +283,6 @@ export default function LocationSection() {
                 </div>
               </div>
             </div>
-
-            {/* Salon Description */}
-            <div className="mt-4 text-center">
-              <p className="text-yellow-700 text-sm">
-                Desliza para ver más imágenes del salón
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Additional Info Section */}
-        <div className="mt-16 text-center fade-in-up">
-          <div className="bg-white/50 backdrop-blur-xl border border-yellow-300/40 rounded-2xl p-6 max-w-2xl mx-auto">
-            <h4 className="font-serif text-xl font-bold text-yellow-800 mb-3">
-              Información Adicional
-            </h4>
-            <p className="text-yellow-700">
-              Te esperamos para celebrar juntos este día tan especial. No
-              olvides confirmar tu asistencia y revisa los detalles del evento.
-            </p>
           </div>
         </div>
       </div>
