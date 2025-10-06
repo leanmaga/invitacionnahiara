@@ -221,7 +221,6 @@ export default function LocationSection() {
                         alt={`Imagen del salón ${index + 1}`}
                         fill
                         className="w-full h-full object-cover"
-                        loading="lazy"
                       />
                     </div>
                   ))}
