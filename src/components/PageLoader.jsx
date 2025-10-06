@@ -87,19 +87,6 @@ const PageLoader = () => {
     setParticles(particleData);
   }, []);
 
-  if (!isClient) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
-        <div className="text-center z-10 px-8">
-          <div className="text-6xl mb-8">✨</div>
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-700 via-yellow-600 to-orange-700">
-            Cargando...
-          </h1>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <motion.div
       initial={{ opacity: 1 }}
