@@ -276,7 +276,6 @@ const MasonryGallery = () => {
               onLoad={handleImageLoad}
               onError={handleImageError}
               priority={true}
-              loading="eager"
             />
 
             <div className="image-overlay">
